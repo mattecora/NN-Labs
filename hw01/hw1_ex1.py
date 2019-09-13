@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 
+plt.rc('text', usetex=True)
+
 # 2nd layer
 S0 = [[-1, -1]]
 S1 = [[-1, 1], [1, -1], [1, 1]]
@@ -14,4 +16,5 @@ plt.plot([-5, 5], [-x - 1 for x in [-5, 5]], color="g", linestyle="--")
 plt.grid()
 plt.axis([-2, 2, -2, 2])
 plt.title("OR logical function using signum activation")
+plt.legend(["$y = -1$", "$y = 1$"])
 plt.show()
