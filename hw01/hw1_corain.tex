@@ -10,12 +10,12 @@
 
 \tikzset{
   block/.style    = {draw, thick, rectangle, minimum height = 3em, minimum width = 3em},
-  sum/.style      = {draw, circle, node distance = 2cm},
+  sum/.style      = {draw, circle},
   input/.style    = {coordinate, circle},
   output/.style   = {coordinate, circle}
 }
 
-\lstset{basicstyle=\ttfamily,columns=flexible,breaklines=true}
+\lstset{basicstyle=\ttfamily,language=python,columns=flexible,breaklines=true}
 
 \title{Homework 1}
 \subtitle{CS 559 - Neural Networks - Fall 2019}
@@ -208,8 +208,126 @@ The only region in which the network returns a positive value, therefore, is reg
 
 \section{Question 3}
 
+\subsection{Exact weights selection}
+
+The first steps of the problem require to generate a random vector of exact weights, which will be used later for the classification of the training samples. This has been accomplished by means of the \texttt{uniform()} function in the \texttt{random} library of the NumPy package; the generated weights have then been used to construct a Numpy \texttt{array} named \texttt{wr}. Those weights are then logged to the console; in this particular instance of the script, they were picked as:
+
+$$ w_r = [\begin{matrix} -0.1437898 & 0.94758982 & 0.7844713 \end{matrix}] $$
+
+\subsection{Generation of the training set}
+
+The same approach has been used for the generation of the training set \texttt{S} for the network. This has been populated using the list comprehension syntax provided by the Python language, which allows to repeat the same action (in this case, the creation of a NumPy \texttt{array} having two randomly picked components) for a given number of times, described by the variable \texttt{n\_samples}. For convenience and efficiency, the training samples have been generated with an additional first component identically set to 1: this allows to multiply those vectors directly with a weights vector, taking into consideration also the contribution given by the perceptron's bias.
+
+After the generation of the training set, the samples have been classified in two groups, \texttt{S0} and \texttt{S1}, according to the output returned by an “ideal” perceptron using the computed exact weights. For this purpose, the list comprehension syntax has been used again; in a first step, the vector of the desired outputs \texttt{d} has been computed, whose components are set to 1 in the case the result of the product $[ \begin{matrix}1 & x_1 & x_2 \end{matrix}][\begin{matrix} w_0 & w_1 & w_2 \end{matrix}]^T$ is positive, 0 otherwise. Using these data, the two sets \texttt{S0} and \texttt{S1} may be simply computed by considering the elements of the training set \texttt{S[i]} having respectively \texttt{d[i] = 0} or \texttt{d[i] = 1}. In this particular instance of the script, running with \texttt{n\_samples} equal to 100, we had 58 samples in set \texttt{S0} and 42 in set \texttt{S1}.
+
+\subsection{Plotting data and separator}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.7\linewidth]{exact_sep.pdf}
+\caption{Data separation using the exact weights}
+\end{figure}
+
+In order to plot the data and the ideal separator on the $x_1$-$x_2$ plane, the \texttt{plot\_data\_and\_sep()} function has been defined. This takes as parameters the two sets \texttt{S0} and \texttt{S1}, and the vector of weights \texttt{w} to be used. The function performs the following actions:
+
+\begin{itemize}
+
+\item It initializes a new Matplotlib figure;
+
+\item It plots a data point for each element in set \texttt{S0}, using as its $x$ value its second component (the first is identically set to 1) and as its $y$ value its third component; data points in \texttt{S0} are represented by red squares;
+
+\item It plots a data point for each element in \texttt{S1}, represented by blue circles;
+
+\item It plots the separator line in dashed green, using as $x$ values -1 and 1 and as $y$ values the ones computed by expliciting the linear relationship for $x_2$ and substituting $x_1$ with -1 and 1:
+
+$$ x_2 = -\frac{w_0 + w_1 x_1}{w_2} $$
+
+\item It sets the boundaries of the figure to $[-1;1]$ along both axes;
+
+\item It prints a title and a legend, then shows the result without blocking the execution.
+
+\end{itemize}
+
+\subsection{Running the Perceptron Training Algorithm}
+
+The Perceptron Training Algorithm has been coded as a separate function, called \texttt{pta()}, which takes as argument the value of the parameter \texttt{eta} to be used, the vector \texttt{w0} of initial weights, the training set \texttt{S} and the vector of the desired outputs \texttt{d}. This function implements a slightly modified version of the standard PTA, performing the following actions:
+
+\begin{itemize}
+
+\item It initializes the PTA variables, creating a copy \texttt{w} of the array \texttt{w0} that will be used to compute the final weights and setting to 0 the number of \texttt{epochs} of the algorithm;
+
+\item It initializes an array, called \texttt{mclass}, in which the number of misclassified objects is stored for each epoch (starting from epoch 0, which is the number of misclassifications computed using the initial random weights); those are computed using the \texttt{count\_mclass()} function, which sums inline the elements of a vector (created using the list comprehension syntax) whose components are set to 1 in case the value of the product $wx^T$ is different to the expected one, stored in the vector \texttt{d};
+
+\item It starts a \texttt{while} loop, which stops when the number of misclassification at the previous epoch has reached zero (we have found the weights that correctly classify the entire training set); at each iteration:
+
+\begin{itemize}
+
+\item It increments the number of \texttt{epochs};
+
+\item It loops through all training samples $x_i$, updating the weights according to the formula:
+
+$$ w = w + \eta x_i (d_i - u(w x_i)) $$
+
+\item It computes the number of misclassifications for the current epoch and logs the results.
+
+\end{itemize}
+
+\item When the main loop terminates, the procedure returns the array of the computed weights \texttt{w}, the number of \texttt{epochs} and the array of misclassifications per epoch \texttt{mclass}.
+
+\end{itemize}
+
+This function is made run multiple times with a variable value of \texttt{eta} but with a fixed vector \texttt{w0}, so that the differences in the results depend only on the selected value of the parameter. For this particular instance of the script, the obtained weights with the corresponding number of epochs needed for their computation are shown in the table below.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$\eta$ & $w_0$       & $w_1$       & $w_2$      & Epochs \\ \hline
+1      & -0.6493862  & 4.58359584  & 3.94124711 & 7      \\ \hline
+10     & -10.6493862 & 70.07911636 & 59.0983191 & 18     \\ \hline
+0.1    & -0.1493862  & 0.86666667  & 0.67531926 & 21     \\ \hline
+\end{tabular}
+\caption{Computed weights using different values of $\eta$}
+\end{table}
+
+\subsection{Considerations on the computed weights}
+
+Lorem ipsum dolor sit amet.
+
+\subsection{Plotting the misclassification rate}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.7\linewidth]{mclass_per_epoch.pdf}
+\caption{Number of misclassified items per epoch}
+\end{figure}
+
+After each run of the algorithm, the number of misclassified objects per epoch is plotted by means of the \texttt{plot\_mclass()} function; this performs the following actions:
+
+\begin{itemize}
+
+\item It initializes a new Matplotlib figure;
+
+\item It plots the number of misclassification against the number of the epoch (epoch 0 represents the initial number of misclassified objects, using the random weights);
+
+\item It adjust the axes of the graph (0 to the number of epochs for the $x$ axis, 0 to the maximum value of the misclassification vector for the $y$ axis);
+
+\item It prints a title to the graph, enables the grid and shows the result without blocking the execution.
+
+\end{itemize}
+
+As expected, the number of misclassifications decreases with the epoch number, although not always monotonically, until it finally reaches zero (the desired weights have been computed).
+
+\subsection{Effects of the value of $\eta$ on convergence speed}
+
+Lorem ipsum dolor sit amet.
+
+\subsection{Differences given by a larger number of samples}
+
+Lorem ipsum dolor sit amet.
+
 \subsection{Complete Python code}
 
-\lstinputlisting[basicstyle=\ttfamily\scriptsize,language=python]{hw1_ex3.py}
+\lstinputlisting[basicstyle=\ttfamily\scriptsize]{hw1_ex3.py}
 
 \end{document}
