@@ -366,7 +366,7 @@ $$ x_2 = -\frac{w_1x_1 + w_0}{w_2} = -\frac{w_1}{w_2}x_1 -\frac{w_0}{w_2} $$
 
 This is indeed the equation of a line in the $x_1$-$x_2$ plane, having:
 
-$$ m = -\frac{w_1}{w_0}, q = -\frac{w_0}{w_2} $$
+$$ m = -\frac{w_1}{w_2}, q = -\frac{w_0}{w_2} $$
 
 The $m$ and $q$ parameters are, in this case, the real values of interest, since they allow to characterize the separator in an unambiguous way, regardless of the order of magnitude of the weights computed by the algorithm. If we calculate the values of $m$ and $q$ for all the set of weights, we obtain the result in table \ref{m_q_weights}.
 
@@ -493,7 +493,7 @@ The first fact may be motivated since, due to growth of the training set, statis
 \label{all_sep_1000}
 \end{figure}
 
-The usage of a different data set impacts, as already explained, also on the optimal value of $\eta$ to be used. Also in this case, the best convergence time has been obtained using $\eta = 1$; both cases with $\eta = 1$ and $\eta = 10$ reached convergence in a lower number of epochs with respect to the previous case (this may be due to the greater number of samples, which make possible to update the computed weights a greater number of times for each epoch), while the case with $\eta = 0.1$ required more epochs than in the previous case. Figure \ref{mclass_per_epoch_1000} shows the misclassification rate per epoch for the three values of $\eta$.
+The usage of a different data set impacts, as already explained, also on the optimal value of $\eta$ to be used. Similarly to the previous case, the best convergence time has been obtained using $\eta = 1$; both cases with $\eta = 1$ and $\eta = 10$ reached convergence in a lower number of epochs with respect to the previous case (this may be due to the greater number of samples, which make possible to update the computed weights a greater number of times for each epoch), while the case with $\eta = 0.1$ required more epochs than in the previous case. Figure \ref{mclass_per_epoch_1000} shows the misclassification rate per epoch for the three values of $\eta$.
 
 \begin{figure}[h]
 \centering

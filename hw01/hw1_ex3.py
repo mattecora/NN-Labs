@@ -50,26 +50,27 @@ def plot_data_and_sep(S0, S1, w):
 
     # Set plot options
     plt.title("Class separation")
-    plt.legend(["$S_0$", "$S_1$", "Boundary"], loc="upper right")
+    plt.legend(["$S_0$", "$S_1$", "Boundary"], loc=1)
     plt.axis([-1, 1, -1, 1])
 
     # Show plot
     plt.show(block=False)
 
-def plot_data_and_sep_all(S0, S1, w, eta):
+def plot_data_and_sep_all(S0, S1, wr, w, eta):
     # Create new figure
     plt.figure()
 
     # Plot data
     plt.plot([x[1] for x in S0], [x[2] for x in S0], marker="s", linestyle="none", fillstyle="none")
     plt.plot([x[1] for x in S1], [x[2] for x in S1], marker="o", linestyle="none", fillstyle="none")
+    plt.plot([-1, 1], [-(wr[0] + wr[1] * x) / wr[2] for x in [-1, 1]], linestyle="--")
 
     for e in eta:
         plt.plot([-1, 1], [-(w[e][0] + w[e][1] * x) / w[e][2] for x in [-1, 1]], linestyle="--")
 
     # Set plot options
     plt.title("Class separation for different values of $\eta$")
-    plt.legend(["$S_0$", "$S_1$", "Boundary (exact)", "Boundary ($\eta=1$)", "Boundary ($\eta=10$)", "Boundary ($\eta=0.1$)"], loc="upper right")
+    plt.legend(["$S_0$", "$S_1$", "Boundary (exact)"] + ["Boundary ($\eta={}$)".format(e) for e in eta], loc=1)
     plt.axis([-1, 1, -1, 1])
 
     # Show plot    
@@ -85,7 +86,7 @@ def plot_mclass(mclass, eta):
     
     # Set plot options
     plt.title("Misclassifications per epoch")
-    plt.legend(["$\eta = {}$".format(e) for e in eta], loc="upper right")
+    plt.legend(["$\eta = {}$".format(e) for e in eta], loc=1)
     plt.grid()
 
     # Show plot
@@ -125,7 +126,7 @@ for eta in [1, 10, 0.1]:
     weights[eta], epochs[eta], mclass[eta] = pta(eta, w0, S, d)
 
 # Plot separators and misclassification rate
-plot_data_and_sep_all(S0, S1, weights, [1, 10, 0.1])
+plot_data_and_sep_all(S0, S1, wr, weights, [1, 10, 0.1])
 plot_mclass(mclass, [1, 10, 0.1])
 
 # Maintain graphs
