@@ -10,11 +10,11 @@
 \usetikzlibrary{shapes,arrows}
 
 \tikzset{
-  block/.style    = {draw, thick, rectangle},
+  block/.style    = {draw, thick, rectangle, minimum height = 3em, minimum width = 3em},
   sum/.style      = {draw, circle},
   input/.style    = {coordinate, circle},
   output/.style   = {coordinate, circle},
-  neuron/.style   = {draw, thick, circle}
+  neuron/.style   = {draw, thick, circle, minimum height = 3em, minimum width = 3em}
 }
 
 \lstset{basicstyle=\ttfamily,language=python,columns=flexible,breaklines=true}
@@ -230,7 +230,159 @@ $$ w = [\begin{matrix} -0.5 & 1 & 1 \end{matrix}] $$
 \label{sep_10000}
 \end{figure}
 
+% The described network has been implemented in a computer program and used to classify 10000 random samples $x_i \in [-2.5, 2.5]^2$. Results are shown in figure \ref{sep_10000}.
+
 \section{Question 2}
+
+\subsection{Parsing of the input files}
+
+The first step to take for the sake of the exercise is to parse the input files, encoded using the binary IDX format, into Numpy arrays that can be used to train the network using the multicategory PTA. As described in the provided website, those files are structured according to the following scheme:
+
+\begin{itemize}
+
+\item The first four bytes represent the \emph{magic number}, which has the following meaning:
+
+\begin{itemize}
+
+\item The first two bytes are identically set to 0;
+
+\item The third byte identifies the type of the data stored in the file, which is in this case \emph{unsigned integer} (associated to the hexadecimal value 0x08);
+
+\item The fourth byte identifies the \emph{number of dimensions} of the stored data, which is set to 1 for the labels files (single vector containing all the labels) and to 3 for the images files (vector containing a list of 2-dimensional matrices).
+
+\end{itemize}
+
+In this case, the magic number is therefore set to decimal value 2051 for images files and to decimal value 2049 for labels files.
+
+\item The following four bytes tell how many items are present in the collection; this is set to 60000 for training files and to 10000 for test files;
+
+\item In the images files, the following pair of 4-bytes integers explicit the width and height of the samples (in this case, they are 28 pixels by 28 pixels);
+
+\item The following bytes represent the data to be parsed.
+
+\end{itemize}
+
+All numeric values are stored using the \emph{big endian} format, which means that the most significant bytes are stored at lower offset values. In order to parse the images and labels files, two separate functions have been coded:
+
+\begin{itemize}
+
+\item Function \texttt{idx\_images\_parse()} is used to parse the images files encoded in the IDX format; it performs the following actions:
+
+\begin{itemize}
+
+\item It opens the given file in \emph{read binary} mode;
+
+\item It reads the magic number using the \texttt{fromfile()} function provided by the Numpy library, which allows to read a certain number of elements (in this case, a single one) from a file given their data type (in this case, big endian \texttt{>}, unsigned integer \texttt{u} on four bytes \texttt{4}) and checks its correctness (it must be equal to 2051);
+
+\item In the same way, it reads the number of items and the dimensions of the input images into variables \texttt{n\_samples}, \texttt{n\_rows} and \texttt{n\_cols};
+
+\item Using the list comprehension syntax provided by the Python language and the \texttt{fromfile()} function provided by the Numpy library, it reads \texttt{n\_samples} arrays of \texttt{n\_rows * n\_cols} elements stored as big endian, unsigned 8-bits integers (\texttt{>u1}), reshapes them to the correct format and stores them into the \texttt{samples} variable;
+
+\item It returns variables \texttt{n\_samples}, \texttt{n\_rows}, \texttt{n\_cols} and \texttt{samples}.
+
+\end{itemize}
+
+\item Function \texttt{idx\_labels\_parse()} is used to parse the labels files encoded in the IDX format; it performs similar actions with respect to the previous one, the only differences being that in this case samples dimensions are not present and that data items are represented by single 8-bits elements.
+
+\end{itemize}
+
+\subsection{Running the multicategory PTA algorithm}
+
+The multicategory Perceptron Training Algorithm has been coded as a separate function, called \texttt{multcat\_pta()}. It takes as arguments the list of training samples (\texttt{train\_samples}), the list of training labels (\texttt{train\_labels}), the initial weights matrix (\texttt{start\_weights}), the number of samples to use (\texttt{n}), the value of $\eta$ (\texttt{eta}), the value of $\epsilon$ (\texttt{eps}) and the maximum number of epochs for which the algorithm can run (\texttt{max\_epochs}); it returns the computed weights, the number of epochs needed and the number of classification errors per epoch. This function performs the following actions:
+
+\begin{itemize}
+
+\item It creates a copy of the initial weights into the \texttt{weights} matrix and initializes the \texttt{epochs} variable to 0;
+
+\item It allocates the \texttt{errors} list, which is initialized with the number of classification errors obtained using the initial weights; those are computed by using the \texttt{count\_errors()} function, which performs the sum of the elements of a list (created using the list comprehension syntax) that are set to 1 when the computed label is different from the expected label (extracted from the vector $v = Wx_i$ by means of the \texttt{array\_to\_label()} function, which simply returns the index of the component with the maximum value by means of the \texttt{argmax()} function of the Numpy library);
+
+\item It loops until either the proportion of misclassified samples falls below the given value of $\epsilon$ or the maximum number of epochs has been reached; at each iteration, the following actions are taken: 
+
+\begin{itemize}
+
+\item The number of epochs is incremented;
+
+\item The weights matrix is updated once for each training sample, by adding to it the quantity $\eta (d(x_i) - u(Wx_i)) x_i^T$; vector $d(x_i)$ is created using \texttt{label\_to\_array()}, which creates a binary array having as its only component set to 1 the one with the index given by the label, while function $u(\cdot)$ has been implemented using the \texttt{heaviside()} function of the Numpy library;
+
+\item The number of classification errors obtained using the updated weights, computed using the already described \texttt{count\_errors()} function, is appended to the \texttt{errors} list.
+
+\end{itemize}
+
+\item When the loop terminates, the values of \texttt{weights}, \texttt{epochs} and \texttt{errors} are returned.
+
+\end{itemize}
+
+The number of classification errors per epoch may then be plotted using the \texttt{plot\_errors()} function, which creates a Matplotlib figure, plots the data, sets the title of the graph, enables the grid and shows the graph without blocking the execution.
+
+\subsection{Results for variable $n$}
+
+For the first part of the exercise, the multicategory PTA has been used to train a network having fixed the values of $\eta = 1$, of $\epsilon = 0$ and of an initial weight matrix $W_0$ to a set of random values in $[-1, 1]$. The only variable in the three cases has been the number of training samples $n$ that the algorithm had to use, which was set to 50, 1000 and 60000 (the entire set) in the three runs. Results are shown in table \ref{results_varn}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+$n$   & Epochs for convergence & Test set errors \\ \hline
+50    & 4  & 4361 (43.610\%) \\ \hline
+1000  & 43 & 1738 (17.380\%) \\ \hline
+60000 & -  & 1554 (15.540\%) \\ \hline
+\end{tabular}
+\caption{Results for the runs with variable $n$}
+\label{results_varn}
+\end{table}
+
+The algorithm was able to reach convergence both for $n = 50$ and for $n = 1000$ in a relatively low number of epochs (4 and 43, respectively); this means that the trained network is able to classify correctly all the considered items of the training set (since $\epsilon$ is set to 0). However, the performances of the network are very poor, especially for $n = 50$: when the obtained set of weights is used to classify the patterns in the test set, in fact, we get a significant proportion of misclassified items.
+
+This may be justified by the small dimensions of the data sets used for training: the separation obtained via this kind of network, in fact, may be sufficient for the classification of a reduced training set, but it may be quite different from the “optimal” one. In other words, the computed sets of weights are able to correctly discriminate the few data points in the training set (that means that the algorithm worked correctly), but they are unable to correctly classify large numbers of objects (the separation is not optimal).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.49\linewidth]{errors_50.pdf}
+\includegraphics[width=.49\linewidth]{errors_1000.pdf}
+\caption{Classification error rate per epoch ($n = 50, 1000$)}
+\label{errors_50_1000}
+\end{figure}
+
+In the third run, the network is trained using the entire data set; in this case, the algorithm was not able to converge in a manageable number of epochs (epoch limit was set to 250). This is due to the size of the data set and to the probable impossibility to linearly separate the classes of interest: in fact, after the initial epochs, the error rate did not continue to show a decreasing tendency, but instead remained quite stable around 12\%-18\%. At the time the epoch limit was reached, the network still misclassified 8742 elements of the training set (14.570\%). 
+
+In this case, we can see that the proportion of misclassified patterns for the training set matches more closely the results found for the test set (15.540\%, coming from 1554 misclassifications). This was somehow expected, since we are using all the data we have in the training set: given the greater dimension of the input set, in fact, this measure becomes statistically significant also for the training set (it was not in the previous cases, using a reduced number of samples).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.7\linewidth]{errors_60000.pdf}
+\caption{Classification error rate per epoch ($n = 60000$)}
+\label{errors_60000}
+\end{figure}
+
+\subsection{Results for variable $W_0$}
+
+For the last part of the exercise, the training algorithm has been used to train a network after having fixed the values of $n = 60000$ (all training samples used), $\epsilon = 0.125$ (maximum error rate on the training set of 12.5\%) and $\eta = 5$. Three runs have been executed, all using different values for the matrix of the initial weights $W_0$. Results are shown in table \ref{results_varw}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Run   & Epochs for convergence & Training set errors & Test set errors \\ \hline
+1     & 114 & 7486 (12.477\%) & 1315 (13.150\%) \\ \hline
+2     & 53  & 7387 (12.312\%) & 1293 (12.930\%) \\ \hline
+3     & 182 & 7271 (12.118\%) & 1283 (12.830\%) \\ \hline
+\end{tabular}
+\caption{Results for the runs with variable $W_0$}
+\label{results_varw}
+\end{table}
+
+As we can see, results for the three runs are quite close for all parameters except for the number of epochs required to make the algorithm converge. In fact, the Perceptron Training Algorithm is very dependent on the choice of initial weights; even in the cases in which it guarantees convergence (in case of linear separability of the classes), it may take more or less epochs to reach it. In the presented case, the second run was the one that required the least number of epochs to reach convergence (53).
+
+As for the classification accuracy, we can see that, as in the previous case, results for training and test sets are quite close, which is expected since we are training the network with all the available training data. Of the three runs, the one that yielded the best results overall was the third, with a test set inaccuracy of 12.83\%.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.45\linewidth]{errors_60000_125_1.pdf}
+\includegraphics[width=.45\linewidth]{errors_60000_125_2.pdf}
+\includegraphics[width=.45\linewidth]{errors_60000_125_3.pdf}
+\caption{Classification error rate per epoch (variable $W_0$)}
+\label{errors_varw}
+\end{figure}
 
 \subsection{Complete Python code}
 

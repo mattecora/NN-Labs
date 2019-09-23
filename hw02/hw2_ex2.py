@@ -4,24 +4,30 @@ import matplotlib.pyplot as plt
 # Use TeX for text rendering
 plt.rc('text', usetex=True)
 
-def count_errors(S, n, W, d):
-    # Count misclassifications with the given weights
-    return sum([np.argmax(W @ S[i]) != d[i] for i in range(n)])
+# Set the random seed for reproducibility
+np.random.seed(25)
 
 def label_to_array(label):
     # Transform a label into a binary array
-    a = np.zeros(10).reshape(10, 1)
-    a[label] = 1
-    return a
+    return np.array([1 if i == label else 0 for i in range(10)]).reshape(10, 1)
+
+def array_to_label(array):
+    # Transform a binary array into a label
+    return np.argmax(array)
+
+def count_errors(S, n, W, d):
+    # Count misclassifications with the given weights
+    return sum([1 if array_to_label(W @ S[i]) != d[i] else 0 for i in range(n)])
 
 def multcat_pta(train_samples, train_labels, start_weights, n, eta, eps, max_epochs):
-    # Initialize W randomly
+    # Initialize PTA variables
     weights = np.array(start_weights)
-
-    # Initialize parameters
     epochs = 0
+    
+    # Initialize errors array
     errors = []
     errors.append(count_errors(train_samples, n, weights, train_labels))
+    print("Epoch {} errors: {} ({:.03%}).".format(epochs, errors[len(errors) - 1], errors[len(errors) - 1] / n))
 
     # Run the multicategory PTA algorithm
     while errors[epochs] / n > eps and epochs < max_epochs:
@@ -49,8 +55,9 @@ def plot_errors(errors):
 
 def idx_images_parse(filename):
     with open(filename, "rb") as f:
-        # Discard magic number
-        np.fromfile(f, dtype=">i", count=1)
+        # Check magic number
+        if np.fromfile(f, dtype=">u4", count=1)[0] != 2051:
+            return False, False, False, False
 
         # Read number of samples, rows and columns
         n_samples = np.fromfile(f, dtype=">u4", count=1)[0]
@@ -64,8 +71,9 @@ def idx_images_parse(filename):
 
 def idx_labels_parse(filename):
     with open(filename, "rb") as f:
-        # Discard magic number
-        np.fromfile(f, dtype=">i", count=1)
+        # Check magic number
+        if np.fromfile(f, dtype=">u4", count=1)[0] != 2049:
+            return False, False
 
         # Read number of labels
         n_labels = np.fromfile(f, dtype=">u4", count=1)[0]
@@ -86,14 +94,12 @@ _, test_labels = idx_labels_parse("t10k-labels.idx1-ubyte")
 print("Test set loaded.")
 
 # First run: fixed W0, n = 50-1000-60000, eps = 0, eta = 1
-W0 = np.random.uniform(size=(10, n_rows*n_cols))
-nv = [50, 1000, n_train_samples]
-epsv = [0, 0, 0]
-etav = [1, 1, 1]
-max_epochsv = [250, 250, 250]
+W0 = np.random.uniform(-1, 1, size=(10, n_rows*n_cols))
+eps = 0
+eta = 1
+max_epochs = 250
 
-for i in range(len(nv)):
-    n, eps, eta, max_epochs = nv[i], epsv[i], etav[i], max_epochsv[i]
+for n in [50, 1000, n_train_samples]:
     print("Running with n = {}, eps = {}, eta = {}.".format(n, eps, eta))
 
     # Run the multicategory PTA algorithm
@@ -108,14 +114,13 @@ for i in range(len(nv)):
     print("Test set errors: {} ({:.03%}).".format(test_errors, test_errors / n_test_samples))
 
 # Second run: variable W0, n = 60000, eps = 0.125, eta = 1-10-0.1
-nv = [n_train_samples, n_train_samples, n_train_samples]
-epsv = [0.125, 0.125, 0.125]
-etav = [1, 10, 0.1]
-max_epochsv = [250, 250, 250]
+n = n_train_samples
+eps = 0.125
+eta = 5
+max_epochs = 250
 
-for i in range(len(nv)):
-    W0 = np.random.uniform(size=(10, n_rows*n_cols))
-    n, eps, eta, max_epochs = nv[i], epsv[i], etav[i], max_epochsv[i]
+for i in range(3):
+    W0 = np.random.uniform(-1, 1, size=(10, n_rows*n_cols))
     print("Running with n = {}, eps = {}, eta = {}.".format(n, eps, eta))
 
     # Run the multicategory PTA algorithm
