@@ -323,17 +323,17 @@ For the first part of the exercise, the multicategory PTA has been used to train
 \begin{tabular}{|c|c|c|}
 \hline
 $n$   & Epochs for convergence & Test set errors \\ \hline
-50    & 4  & 4361 (43.610\%) \\ \hline
-1000  & 43 & 1738 (17.380\%) \\ \hline
-60000 & -  & 1554 (15.540\%) \\ \hline
+50    & 5  & 4667 (46.670\%) \\ \hline
+1000  & 42 & 1749 (17.490\%) \\ \hline
+60000 & -  & 1559 (15.590\%) \\ \hline
 \end{tabular}
 \caption{Results for the runs with variable $n$}
 \label{results_varn}
 \end{table}
 
-The algorithm was able to reach convergence both for $n = 50$ and for $n = 1000$ in a relatively low number of epochs (4 and 43, respectively); this means that the trained network is able to classify correctly all the considered items of the training set (since $\epsilon$ is set to 0). However, the performances of the network are very poor, especially for $n = 50$: when the obtained set of weights is used to classify the patterns in the test set, in fact, we get a significant proportion of misclassified items.
+The algorithm was able to reach convergence both for $n = 50$ and for $n = 1000$ in a relatively low number of epochs (5 and 42, respectively); this means that the trained network is able to classify correctly all the considered items of the training set (since $\epsilon$ is set to 0). However, the performances of the network are very poor, especially for $n = 50$: when the obtained set of weights is used to classify the patterns in the test set, in fact, we get a significant proportion of misclassified items.
 
-This may be justified by the small dimensions of the data sets used for training: the separation obtained via this kind of network, in fact, may be sufficient for the classification of a reduced training set, but it may be quite different from the “optimal” one. In other words, the computed sets of weights are able to correctly discriminate the few data points in the training set (that means that the algorithm worked correctly), but they are unable to correctly classify large numbers of objects (the separation is not optimal).
+This may be justified by the small dimensions of the data sets used for training: the separation obtained via this kind of network, in fact, may be sufficient for the classification of a reduced number of training samples, but it may be quite different from the “desired” one. In other words, the computed sets of weights are able to correctly discriminate the few data points in the training set (that means that the algorithm worked correctly), but they are not good enough to correctly classify test samples (the separation is not optimal).
 
 \begin{figure}[h]
 \centering
@@ -343,9 +343,9 @@ This may be justified by the small dimensions of the data sets used for training
 \label{errors_50_1000}
 \end{figure}
 
-In the third run, the network is trained using the entire data set; in this case, the algorithm was not able to converge in a manageable number of epochs (epoch limit was set to 250). This is due to the size of the data set and to the probable impossibility to linearly separate the classes of interest: in fact, after the initial epochs, the error rate did not continue to show a decreasing tendency, but instead remained quite stable around 12\%-18\%. At the time the epoch limit was reached, the network still misclassified 8742 elements of the training set (14.570\%). 
+In the third run, the network is trained using the entire data set; in this case, the algorithm was not able to converge in a manageable number of epochs (epoch limit was set to 250). This is due to the size of the data set and to the impossibility to linearly separate the classes of interest: in fact, after the initial epochs, the error rate did not continue to show a decreasing tendency, but instead remained quite stable around 12\%-18\%. At the time the epoch limit was reached, the network still misclassified 9071 elements of the training set (15.118\%). 
 
-In this case, we can see that the proportion of misclassified patterns for the training set matches more closely the results found for the test set (15.540\%, coming from 1554 misclassifications). This was somehow expected, since we are using all the data we have in the training set: given the greater dimension of the input set, in fact, this measure becomes statistically significant also for the training set (it was not in the previous cases, using a reduced number of samples).
+In this case, we can see that the proportion of misclassified patterns for the training set matches more closely the results found for the test set (15.590\%, coming from 1559 misclassifications). This was somehow expected, since we are using all the data we have in the training set: given the greater dimension of the input set, in fact, this measure becomes statistically significant also for the training set (it was not in the previous cases, using a reduced number of samples). In any case, due to the impossibility to linearly separate the samples, training with the entire data set shows a limited improvement over the case with $n = 1000$, which took considerably less time to run.
 
 \begin{figure}[h]
 \centering
@@ -371,7 +371,7 @@ Run   & Epochs for convergence & Training set errors & Test set errors \\ \hline
 \label{results_varw}
 \end{table}
 
-As we can see, results for the three runs are quite close for all parameters except for the number of epochs required to make the algorithm converge. In fact, the Perceptron Training Algorithm is very dependent on the choice of initial weights; even in the cases in which it guarantees convergence (in case of linear separability of the classes), it may take more or less epochs to reach it. In the presented case, the second run was the one that required the least number of epochs to reach convergence (53).
+As we can see, results for the three runs are quite close for all parameters except for the number of epochs required to make the algorithm converge. In fact, the Perceptron Training Algorithm is very dependent on the choice of initial weights; even in the cases in which it guarantees convergence (in case of linear separability of the classes), it may take more or less epochs to reach it. In the presented case, the second run was the one that required the least number of epochs to reach convergence at $\epsilon = 12.5\%$ (53).
 
 As for the classification accuracy, we can see that, as in the previous case, results for training and test sets are quite close, which is expected since we are training the network with all the available training data. Of the three runs, the one that yielded the best results overall was the third, with a test set inaccuracy of 12.83\%.
 
@@ -383,6 +383,8 @@ As for the classification accuracy, we can see that, as in the previous case, re
 \caption{Classification error rate per epoch (variable $W_0$)}
 \label{errors_varw}
 \end{figure}
+
+\newpage
 
 \subsection{Complete Python code}
 

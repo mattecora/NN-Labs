@@ -25,8 +25,7 @@ def multcat_pta(train_samples, train_labels, start_weights, n, eta, eps, max_epo
     epochs = 0
     
     # Initialize errors array
-    errors = []
-    errors.append(count_errors(train_samples, n, weights, train_labels))
+    errors = [count_errors(train_samples, n, weights, train_labels)]
     print("Epoch {} errors: {} ({:.03%}).".format(epochs, errors[len(errors) - 1], errors[len(errors) - 1] / n))
 
     # Run the multicategory PTA algorithm
