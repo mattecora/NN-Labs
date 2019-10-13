@@ -139,37 +139,29 @@ The values for the parameters $w_0$ and $w_1$ of the linear least squares fit fo
 
 $$ E = \sum_{i = 1}^{50} (y_i - (w_0 + w_1 x_i))^2 $$
 
-To solve this minimization problem, we can compute the gradient of $E$ and impose it to be equal to the null vector, therefore identifying the $(w_0,w_1)$ coordinates of the absolute minimum of this function.
+Let us rewrite this expression by introducing the matrices:
 
-$$ \nabla E = \left[ \begin{matrix} \frac{\partial E}{\partial w_0} & \frac{\partial E}{\partial w_1} \end{matrix} \right]^T = \left[ \begin{matrix} 0 & 0 \end{matrix} \right]^T $$
+$$ X = \left[ \begin{matrix} 1 & 1 & \dots & 1 \\ x_1 & x_2 & \dots & x_{50} \end{matrix} \right], Y = \left[ \begin{matrix} y_1 & y_2 & \dots & y_{50} \end{matrix} \right] $$
 
-$$ \frac{\partial E}{\partial w_0} = -2 \sum_{i = 1}^{50} (y_i - (w_0 + w_1 x_i)) = 0 $$
+$$ \Rightarrow E = \sum_{i = 1}^{50} (y_i - (w_0 + w_1 x_i))^2 = || Y - WX ||^2 $$
 
-$$ \frac{\partial E}{\partial w_1} = -2 \sum_{i = 1}^{50} x_i (y_i - (w_0 + w_1 x_i)) = 0 $$
+This corresponds to a simple linear optimization problem, which can be solved in a closed form using the pseudoinverse method:
 
-These two constraints are equivalent to the following system of linear equations:
+$$ W = YX^{+} $$
 
-$$ \begin{cases} \sum_{i = 1}^{50} y_i - 50w_0 - w_1 \sum_{i = 1}^{50} x_i = 1 \\ \sum_{i = 1}^{50} x_i y_i - w_0 \sum_{i = 1}^{50} x_i - w_1 \sum_{i = 1}^{50} x_i^2 = 0 \end{cases} $$
-
-From the first equation, we obtain:
-
-$$ w_0 = \frac{\sum_{i = 1}^{50} y_i - w_1 \sum_{i = 1}^{50} x_i}{50} $$
-
-Substituting the value of $w_0$ in the second equation, we can identify the value of $w_1$ as follows:
+Where $X^{+}$ denotes the Moore-Penrose pseudoinverse of $X$. Given that this $X$ has linearly independent rows, the pseudoinverse $X^{+}$ may be computed as:
 
 \begin{multline*}
-\sum_{i = 1}^{50} x_i y_i - \frac{1}{50} \sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} y_i + \frac{1}{50} w_1 \left( \sum_{i = 1}^{50} x_i \right)^2 - w_1 \sum_{i = 1}^{50} x_i^2 = 0 \\
-\Rightarrow w_1 \left[ \frac{1}{50} \left( \sum_{i = 1}^{50} x_i \right)^2 - \sum_{i = 1}^{50} x_i^2 \right] = \frac{1}{50} \sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} y_i - \sum_{i = 1}^{50} x_i y_i \\
-\Rightarrow w_1 = \frac{\frac{1}{50} \sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} y_i - \sum_{i = 1}^{50} x_i y_i}{\frac{1}{50} \left( \sum_{i = 1}^{50} x_i \right)^2 - \sum_{i = 1}^{50} x_i^2} = \frac{\sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} y_i - 50 \sum_{i = 1}^{50} x_i y_i}{\left( \sum_{i = 1}^{50} x_i \right)^2 - 50 \sum_{i = 1}^{50} x_i^2}
+X^{+} = X^T \left( XX^T \right)^{-1} = \left[ \begin{matrix} 1 & x_1 \\ 1 & x_2 \\ \vdots & \vdots \\ 1 & x_{50} \end{matrix} \right] \left( \left[ \begin{matrix} 1 & 1 & \dots & 1 \\ x_1 & x_2 & \dots & x_{50} \end{matrix} \right] \left[ \begin{matrix} 1 & x_1 \\ 1 & x_2 \\ \vdots & \vdots \\ 1 & x_{50} \end{matrix} \right] \right)^{-1} \\
+= \left[ \begin{matrix} 1 & x_1 \\ 1 & x_2 \\ \vdots & \vdots \\ 1 & x_{50} \end{matrix} \right] \left[ \begin{matrix} 50 & \sum_{i = 1}^{50} x_i \\[0.5em] \sum_{i = 1}^{50} x_i & \sum_{i = 1}^{50} x_i^2 \end{matrix} \right]^{-1} = \frac{1}{50 \sum_{i = 1}^{50} x_i^2 - \left( \sum_{i = 1}^{50} x_i \right)^2} \left[ \begin{matrix} 1 & x_1 \\ 1 & x_2 \\ \vdots & \vdots \\ 1 & x_{50} \end{matrix} \right] \left[ \begin{matrix} \sum_{i = 1}^{50} x_i^2 & -\sum_{i = 1}^{50} x_i \\[0.5em] -\sum_{i = 1}^{50} x_i & 50 \end{matrix} \right] \\
+= \frac{1}{50 \sum_{i = 1}^{50} x_i^2 - \left( \sum_{i = 1}^{50} x_i \right)^2} \left[ \begin{matrix} \sum_{i = 1}^{50} x_i^2 - x_1 \sum_{i = 1}^{50} x_i & -\sum_{i = 1}^{50} x_i + 50 x_1 \\[0.5em] \sum_{i = 1}^{50} x_i^2 - x_2 \sum_{i = 1}^{50} x_i & -\sum_{i = 1}^{50} x_i + 50 x_2 \\[0.5em] \vdots & \vdots \\[0.5em] \sum_{i = 1}^{50} x_i^2 - x_{50} \sum_{i = 1}^{50} x_i & -\sum_{i = 1}^{50} x_i + 50 x_{50} \end{matrix} \right]
 \end{multline*}
 
-Substituting back the obtained value of $w_1$ into the expression of $w_0$, we finally obtain:
+Therefore, the analytic solution of this optimization problem is:
 
 \begin{multline*}
-w_0 = \frac{\sum_{i = 1}^{50} y_i}{50} - \frac{\sum_{i = 1}^{50} x_i}{50} \left[ \frac{\sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} y_i - 50 \sum_{i = 1}^{50} x_i y_i}{\left( \sum_{i = 1}^{50} x_i \right)^2 - 50 \sum_{i = 1}^{50} x_i^2} \right] \\
-= \frac{\sum_{i = 1}^{50} y_i}{50} - \frac{\left( \sum_{i = 1}^{50} x_i \right)^2 \sum_{i = 1}^{50} y_i - 50 \sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} x_i y_i}{50 \left[ \left( \sum_{i = 1}^{50} x_i \right)^2 - 50 \sum_{i = 1}^{50} x_i^2 \right]} \\
-= \frac{\left( \sum_{i = 1}^{50} x_i \right)^2 \sum_{i = 1}^{50} y_i - 50 \sum_{i = 1}^{50} x_i^2 \sum_{i = 1}^{50} y_i - \left( \sum_{i = 1}^{50} x_i \right)^2 \sum_{i = 1}^{50} y_i + 50 \sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} x_i y_i}{50 \left[ \left( \sum_{i = 1}^{50} x_i \right)^2 - 50 \sum_{i = 1}^{50} x_i^2 \right]} \\
-= \frac{50 \sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} x_i y_i - 50 \sum_{i = 1}^{50} x_i^2 \sum_{i = 1}^{50} y_i}{50 \left[ \left( \sum_{i = 1}^{50} x_i \right)^2 - 50 \sum_{i = 1}^{50} x_i^2 \right]} = \frac{\sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} x_i y_i - \sum_{i = 1}^{50} x_i^2 \sum_{i = 1}^{50} y_i}{\left( \sum_{i = 1}^{50} x_i \right)^2 - 50 \sum_{i = 1}^{50} x_i^2}
+W = YX^{+} = \frac{\left[ \begin{matrix} y_1 & y_2 & \dots & y_{50} \end{matrix} \right]}{50 \sum_{i = 1}^{50} x_i^2 - \left( \sum_{i = 1}^{50} x_i \right)^2} \left[ \begin{matrix} \sum_{i = 1}^{50} x_i^2 - x_1 \sum_{i = 1}^{50} x_i & -\sum_{i = 1}^{50} x_i + 50 x_1 \\[0.5em] \sum_{i = 1}^{50} x_i^2 - x_2 \sum_{i = 1}^{50} x_i & -\sum_{i = 1}^{50} x_i + 50 x_2 \\[0.5em] \vdots & \vdots \\[0.5em] \sum_{i = 1}^{50} x_i^2 - x_{50} \sum_{i = 1}^{50} x_i & -\sum_{i = 1}^{50} x_i + 50 x_{50} \end{matrix} \right] \\
+= \left[ \begin{matrix} \frac{\textstyle \sum_{i = 1}^{50} x_i^2 \sum_{i = 1}^{50} y_i - \sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} x_i y_i}{\textstyle 50 \sum_{i = 1}^{50} x_i - \left( \sum_{i = 1}^{50} x_i \right)^2} & \frac{\textstyle -\sum_{i = 1}^{50} x_i^2 \sum_{i = 1}^{50} y_i + 50 \sum_{i = 1}^{50} x_i y_i}{\textstyle 50 \sum_{i = 1}^{50} x_i - \left( \sum_{i = 1}^{50} x_i \right)^2} \end{matrix} \right]
 \end{multline*}
 
 Applying the presented formulas on a randomly generated dataset (the random seed is fixed for reproducibility), we obtain the following values for the linear interpolation coefficients:
