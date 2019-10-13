@@ -188,7 +188,7 @@ In our case, as obtained before:
 
 $$ \nabla E = \left[ \begin{matrix} -2 \sum_{i = 1}^{50} (y_i - (w_0 + w_1 x_i)) & -2 \sum_{i = 1}^{50} x_i (y_i - (w_0 + w_1 x_i)) \end{matrix} \right]^T $$
 
-Using as the stopping condition of the algorithm a mi, the gradient descent method converges (using $\eta = 2.25 * 10^{-5}$) to the following weights:
+Using as the stopping condition of the algorithm a minimum norm for the update term set to $\epsilon = 10^{-6}$, the gradient descent method converges (using $\eta = 2.25 * 10^{-5}$) to the following weights:
 
 $$ w_0 = 0.15429 $$
 $$ w_1 = 0.99767 $$
