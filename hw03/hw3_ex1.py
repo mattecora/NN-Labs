@@ -106,6 +106,8 @@ xymin = np.array([1/3, 1/3])
 x0 = np.random.uniform(0, 1)
 y0 = np.random.uniform(0, 1-x0)
 print("Initial point: ({}, {})".format(x0, y0))
+print("GD update term in (x0, y0):\n{}".format(gradf(x0, y0)))
+print("NM update term in (x0, y0):\n{}".format(np.linalg.inv(hessf(x0, y0)) @ gradf(x0, y0)))
 
 # Run gradient descent
 xy_gd, xylist_gd, fxy_gd = gdesc([x0, y0], eta, eps)

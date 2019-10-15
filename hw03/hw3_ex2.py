@@ -7,19 +7,41 @@ plt.rc('text', usetex=True)
 # Set the random seed for reproducibility
 np.random.seed(2019)
 
-def gradf(xi, yi, w):
+def gradf(xi, yi, w, start, end):
     return -2 * np.array([
-        sum([yi[i] - w[0] - w[1] * xi[i] for i in range(len(xi))]),
-        sum([(yi[i] - w[0] - w[1] * xi[i]) * xi[i] for i in range(len(xi))])
+        sum([yi[i] - w[0] - w[1] * xi[i] for i in range(start, end)]),
+        sum([(yi[i] - w[0] - w[1] * xi[i]) * xi[i] for i in range(start, end)])
     ]).reshape(2, 1)
 
-def hessf(xi, yi, w):
+def hessf(xi, yi, w, start, end):
     return 2 * np.array([
         50,
-        sum(xi),
-        sum(xi),
-        sum([xi[i] ** 2 for i in range(len(xi))])
+        sum(xi[start:end]),
+        sum(xi[start:end]),
+        sum([xi[i] ** 2 for i in range(start, end)])
     ]).reshape(2, 2)
+
+def batch_gdesc(w0, eta, eps, bsize):
+    # Initialize parameters
+    w_gd = np.array(w0)
+    epochs = 0
+
+    while True:
+        # Increment epochs and save old weights
+        epochs = epochs + 1
+        w_old = np.array(w_gd)
+
+        # Update summing according to the batch size
+        for i in range(50 // bsize):
+            w_gd = w_gd - eta * gradf(xi, yi, w_gd, i*bsize, (i+1)*bsize)
+        
+        # Return if the norm of the update is small enough
+        if np.linalg.norm(w_gd - w_old) < eps:
+            return w_gd, epochs
+        
+        # Print message every 1000 epochs
+        if epochs % 1000 == 0:
+            print("Epoch {}: w = {}".format(epochs, w_gd.transpose()))
 
 # Create vectors
 xi = [i + 1 for i in range(50)]
@@ -32,26 +54,16 @@ w_ls = (Y @ np.linalg.pinv(X)).transpose()
 print("LS fit: m = {}, q = {}".format(w_ls[1][0], w_ls[0][0]))
 
 # Compute weights using gradient descent
+w0 = np.array([np.random.uniform(-1, 1), np.random.uniform(-1, 1)]).reshape(2, 1)
 eta = 2.25e-5
 eps = 1e-6
-w_gd = np.array([np.random.uniform(-1, 1), np.random.uniform(-1, 1)]).reshape(2, 1)
+bsize = 1
 
-epochs = 0
-while True:
-    epochs = epochs + 1
-    wnew = w_gd - eta * gradf(xi, yi, w_gd)
-    if np.linalg.norm(wnew - w_gd) < eps:
-        break
-
-    w_gd = wnew
-    if epochs % 1000 == 0:
-        print("Epoch {}: w = {}, g = {}".format(epochs, w_gd.transpose(), gradf(xi, yi, w_gd).transpose()))
-
+w_gd, epochs = batch_gdesc(w0, eta, eps, bsize)
 print("GD fit: m = {}, q = {} (epochs: {})".format(w_gd[1][0], w_gd[0][0], epochs))
 
 # Compute weights after one iteration of Newton's method
-w_nm = np.array([np.random.uniform(-1, 1), np.random.uniform(-1, 1)]).reshape(2, 1)
-w_nm = w_nm - np.linalg.inv(hessf(xi, yi, w_nm)) @ gradf(xi, yi, w_nm)
+w_nm = w0 - np.linalg.inv(hessf(xi, yi, w0, 0, 50)) @ gradf(xi, yi, w0, 0, 50)
 print("NM fit: m = {}, q = {}".format(w_nm[1][0], w_nm[0][0]))
 
 # Plot the LLS fit

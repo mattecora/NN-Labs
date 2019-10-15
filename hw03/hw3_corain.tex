@@ -125,7 +125,36 @@ Newton           & 1      & 7      & $[\begin{matrix} 0.33333286 & 0.33333348 \e
 \label{summ_res}
 \end{table}
 
-As it can be seen from the summary of the results, Newton's method was able to converge in a much lower number of epochs and with a much higher precision to the minimum of $f(x,y)$.
+As it can be seen from the summary of the results, Newton's method was able to converge in a much lower number of epochs and with a much higher precision to the minimum of $f(x,y)$. The second result was somehow expected because the approximation yielded by the Newton's method, using a second-order term instead of only relying on the linear one, is more precise than the one used for the gradient descent method.
+
+For what the first result is concerned, however, results may vary. In fact, if we use the same value of $\eta < 1$ that is able to guarantee convergence for both for the gradient descent and the Newton's methods, we can observe that the Newton's method convergence is much slower than the gradient descent method's. This was tested using different values for the learning rate and in all cases the gradient descent method outperformed Newton's method in terms of number of epochs needed for convergence, as shown in table \ref{var_eta_res}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+$\eta$ & Epochs (gradient descent) & Epochs (Newton's method) \\ \hline
+0.01 & 114 & 988 \\ \hline
+0.015 & 77 & 685 \\ \hline
+0.02 & 57 & 527 \\ \hline
+0.025 & 44 & 430 \\ \hline
+0.03 & 34 & 364 \\ \hline
+0.035 & 25 & 316 \\ \hline
+0.04 & 26 & 280 \\ \hline
+0.045 & 24 & 241 \\ \hline
+0.05 & - & 228 \\ \hline
+\end{tabular}
+\caption{Number of epochs for convergence using different $\eta$ values}
+\label{var_eta_res}
+\end{table}
+
+This result may be motivated by analyzing the step size of both methods. In fact, if we compare the update term $-\nabla f$ of the gradient descent method with the update term $-[Hf]^{-1} \nabla f$ of the Newton's method, we can observe that, for this particular function, the entity of the first is much bigger than the second (in terms of its norm). Let us consider for example what happens in correspondence of the initial point $ (x_0, y_0) = [\begin{matrix} 0.90348 & 0.03794 \end{matrix}] $:
+
+$$ \nabla f(x_0, y_0) = \left[ \begin{matrix} 15.96427362 \\ -9.28681822 \end{matrix} \right] $$
+
+$$ [Hf(x_0, y_0)]^{-1} \nabla f(x_0, y_0) = \left[ \begin{matrix} 0.09058607 \\ -0.03618637 \end{matrix} \right] $$
+
+Therefore, if we use a value of $\eta$ that is able to make the gradient descent method converge, we cannot expect the Newton's method to converge very fast, since its update terms are consistently smaller than the gradient descent's ones. In the case of our function, Newton's method shows its advantages in terms of epochs needed for convergence only when the value of $\eta$ surpasses the critical value for the convergence of gradient descent.
 
 \subsection{Complete Python code}
 
@@ -161,7 +190,7 @@ Therefore, the analytic solution of this optimization problem is:
 
 \begin{multline*}
 W = YX^{+} = \frac{\left[ \begin{matrix} y_1 & y_2 & \dots & y_{50} \end{matrix} \right]}{50 \sum_{i = 1}^{50} x_i^2 - \left( \sum_{i = 1}^{50} x_i \right)^2} \left[ \begin{matrix} \sum_{i = 1}^{50} x_i^2 - x_1 \sum_{i = 1}^{50} x_i & -\sum_{i = 1}^{50} x_i + 50 x_1 \\[0.5em] \sum_{i = 1}^{50} x_i^2 - x_2 \sum_{i = 1}^{50} x_i & -\sum_{i = 1}^{50} x_i + 50 x_2 \\[0.5em] \vdots & \vdots \\[0.5em] \sum_{i = 1}^{50} x_i^2 - x_{50} \sum_{i = 1}^{50} x_i & -\sum_{i = 1}^{50} x_i + 50 x_{50} \end{matrix} \right] \\
-= \left[ \begin{matrix} \frac{\textstyle \sum_{i = 1}^{50} x_i^2 \sum_{i = 1}^{50} y_i - \sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} x_i y_i}{\textstyle 50 \sum_{i = 1}^{50} x_i - \left( \sum_{i = 1}^{50} x_i \right)^2} & \frac{\textstyle -\sum_{i = 1}^{50} x_i^2 \sum_{i = 1}^{50} y_i + 50 \sum_{i = 1}^{50} x_i y_i}{\textstyle 50 \sum_{i = 1}^{50} x_i - \left( \sum_{i = 1}^{50} x_i \right)^2} \end{matrix} \right]
+= \left[ \begin{matrix} \frac{\textstyle \sum_{i = 1}^{50} x_i^2 \sum_{i = 1}^{50} y_i - \sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} x_i y_i}{\textstyle 50 \sum_{i = 1}^{50} x_i - \left( \sum_{i = 1}^{50} x_i \right)^2} & \frac{\textstyle -\sum_{i = 1}^{50} x_i \sum_{i = 1}^{50} y_i + 50 \sum_{i = 1}^{50} x_i y_i}{\textstyle 50 \sum_{i = 1}^{50} x_i - \left( \sum_{i = 1}^{50} x_i \right)^2} \end{matrix} \right]
 \end{multline*}
 
 Applying the presented formulas on a randomly generated dataset (the random seed is fixed for reproducibility), we obtain the following values for the linear interpolation coefficients:
@@ -188,12 +217,25 @@ In our case, as obtained before:
 
 $$ \nabla E = \left[ \begin{matrix} -2 \sum_{i = 1}^{50} (y_i - (w_0 + w_1 x_i)) & -2 \sum_{i = 1}^{50} x_i (y_i - (w_0 + w_1 x_i)) \end{matrix} \right]^T $$
 
-Using as the stopping condition of the algorithm a minimum norm for the update term set to $\epsilon = 10^{-6}$, the gradient descent method converges (using $\eta = 2.25 * 10^{-5}$) to the following weights:
+Using as the stopping condition of the algorithm a minimum requirement on the norm for the update term (set to $\epsilon = 10^{-6}$), the gradient descent method converges (using $\eta = 2.25 * 10^{-5}$ in order not to make the result diverge) after 10749 epochs to the following weights:
 
 $$ w_0 = 0.15429 $$
 $$ w_1 = 0.99767 $$
 
 Those values are actually quite similar to the ones computed when solving the equations in a closed form, and they can possibly be even closer if we decreased furtherly the value of $\epsilon$. In fact, we expect that it would be possible to approximate the regression coefficients as computed using the method of the linear least squares fit with arbitrary precision, if we can afford to make the algorithm run for a sufficient number of epochs.
+
+The described solution may be interpreted as an "offline" version, in which we consider the entire data set (due to the presence of the summations) before updating our weights. We may think of implementing also an online version of the algorithm, that considers one data point at a time according to the rule:
+
+$$ w \leftarrow w - \eta (y_i - w_0 - w_1 x_i) \left[ \begin{matrix} 1 & x_i \end{matrix} \right] $$
+
+For all $(x_i,y_i), i = 1, \dots, 50$. Using this methodology with the same parameters as before, the weights converge after 10858 epochs to the following values:
+
+$$ w_0 = 0.15728 $$
+$$ w_1 = 0.99804 $$
+
+These weights are obviously different from the ones obtained using the standard gradient descent method, but similar considerations could be made on the precision of the approximation.
+
+The proposed method to implement gradient descent, based on the function \texttt{batch\_gdesc()}, allows to use a generic batch size $b$ to perform weights update; for each epoch, the algorithm iterates $\frac{50}{b}$ times, computing the partial sums only on the elements in the $i$-th batch (from $bi$-th item to $b(i+1)$-th item) and using the obtained values for weights update.
 
 \subsection{Newton's method}
 
