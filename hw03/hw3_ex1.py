@@ -33,15 +33,17 @@ def gdesc(xy0, eta, eps):
     
     # Run the algorithm until the gradient is nearly zero
     while True:
-        xynew = xy - eta*gradf(xy[0], xy[1])
-        if np.linalg.norm(xynew - xy) < eps:
-            break
+        # Save old point
+        xy_old = np.array(xy)
 
-        xy = xynew
+        # Perform an update
+        xy = xy - eta*gradf(xy[0], xy[1])
         xylist.append(np.copy(xy))
         fxy.append(f(xy[0], xy[1]))
-    
-    return xy, xylist, fxy
+
+        # Return if the norm of the update is small enough
+        if np.linalg.norm(xy - xy_old) < eps:
+            return xy, xylist, fxy
 
 def newton(xy0, eta, eps):
     # Initialize parameters
@@ -49,17 +51,18 @@ def newton(xy0, eta, eps):
     xylist = [np.copy(xy)]
     fxy = [f(xy[0], xy[1])]
 
-    # Run the algorithm until the gradient is nearly zero
     while True:
-        xynew = xy - eta * np.linalg.inv(hessf(xy[0], xy[1])) @ gradf(xy[0], xy[1])
-        if np.linalg.norm(xynew - xy) < eps:
-            break
+        # Save old point
+        xy_old = np.array(xy)
 
-        xy = xynew
+        # Perform an update
+        xy = xy - eta * np.linalg.inv(hessf(xy[0], xy[1])) @ gradf(xy[0], xy[1])
         xylist.append(np.copy(xy))
         fxy.append(f(xy[0], xy[1]))
-    
-    return xy, xylist, fxy
+
+        # Return if the norm of the update is small enough
+        if np.linalg.norm(xy - xy_old) < eps:
+            return xy, xylist, fxy
 
 def plot_traj(xylist, xymin):
     plt.figure()
@@ -109,14 +112,13 @@ xymin = np.array([1/3, 1/3])
 # Select random initial point
 x0 = np.random.uniform(0, 1)
 y0 = np.random.uniform(0, 1-x0)
-print(f(1/3, 1/3))
 print("Initial point: ({}, {})".format(x0, y0))
 print("GD update term in (x0, y0):\n{}".format(gradf(x0, y0)))
 print("NM update term in (x0, y0):\n{}".format(np.linalg.inv(hessf(x0, y0)) @ gradf(x0, y0)))
 
 # Run gradient descent
 xy_gd, xylist_gd, fxy_gd = gdesc([x0, y0], eta, eps)
-print("Gradient descent iterations: {}".format(len(xylist_gd)))
+print("Gradient descent iterations: {}".format(len(xylist_gd) - 1))
 print("Gradient descent convergence point: {}".format(xy_gd.transpose()))
 
 # Plot results
@@ -128,7 +130,7 @@ eta = 1
 eps = 1e-6
 
 xy_n, xylist_n, fxy_n = newton([x0, y0], eta, eps)
-print("Newton's method iterations: {}".format(len(xylist_n)))
+print("Newton's method iterations: {}".format(len(xylist_n) - 1))
 print("Netwon's method convergence point: {}".format(xy_n.transpose()))
 
 # Plot results

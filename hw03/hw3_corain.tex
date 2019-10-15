@@ -119,8 +119,8 @@ This method was implemented in code using the \texttt{newton()} function, which 
 \begin{tabular}{|c|c|c|c|}
 \hline
 Method           & $\eta$ & Epochs & Convergence value \\ \hline
-Gradient descent & 0.01   & 114    & $[\begin{matrix} 0.33334089 & 0.33332578 \end{matrix}]$ \\ \hline
-Newton           & 1      & 7      & $[\begin{matrix} 0.33333286 & 0.33333348 \end{matrix}]$ \\ \hline
+Gradient descent & 0.01   & 114    & $[\begin{matrix} 0.33334021 & 0.33332646 \end{matrix}]$ \\ \hline
+Newton           & 1      & 7      & $[\begin{matrix} 0.33333333 & 0.33333333 \end{matrix}]$ \\ \hline
 \end{tabular}
 \caption{Summary of the results obtained using gradient descent and Newton's method}
 \label{summ_res}
@@ -155,7 +155,7 @@ $$ \nabla f(x_0, y_0) = \left[ \begin{matrix} 15.96427362 \\ -9.28681822 \end{ma
 
 $$ [Hf(x_0, y_0)]^{-1} \nabla f(x_0, y_0) = \left[ \begin{matrix} 0.09058607 \\ -0.03618637 \end{matrix} \right] $$
 
-Therefore, if we use a value of $\eta$ that is able to make the gradient descent method converge, we cannot expect the Newton's method to converge very fast, since its update terms are consistently smaller than the gradient descent's ones. In the case of our function, Newton's method shows its advantages in terms of epochs needed for convergence only when the value of $\eta$ surpasses the critical value for the convergence of gradient descent.
+Therefore, if we use a value of $\eta$ that is able to make the gradient descent method converge, we cannot expect the Newton's method to converge very fast, since its update terms are consistently smaller than the gradient descent's ones. In the case of our function, Newton's method shows its advantages in terms of epochs only when the value of $\eta$ surpasses the critical value for the convergence of gradient descent.
 
 \subsection{Complete Python code}
 
@@ -225,7 +225,7 @@ $$ w_1 = 0.99767 $$
 
 Those values are actually quite similar to the ones computed when solving the equations in a closed form, and they can possibly be even closer if we decreased furtherly the value of $\epsilon$. In fact, we expect that it would be possible to approximate the regression coefficients as computed using the method of the linear least squares fit with arbitrary precision, if we can afford to make the algorithm run for a sufficient number of epochs.
 
-The described solution may be interpreted as an "offline" version, in which we consider the entire data set (due to the presence of the summations) before updating our weights. We may think of implementing also an online version of the algorithm, that considers one data point at a time according to the rule:
+The described solution may be interpreted as an “offline” learning algorithm, in which we consider the entire data set (due to the presence of the summations) before updating our weights. We may think of implementing also an online version of the algorithm, that considers one data point at a time and updates weights according to the rule:
 
 $$ w \leftarrow w - \eta (y_i - w_0 - w_1 x_i) \left[ \begin{matrix} 1 & x_i \end{matrix} \right] $$
 
