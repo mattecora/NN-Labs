@@ -6,7 +6,6 @@
 \usepackage{listings}
 \usepackage{tikz}
 \usepackage{float}
-\usepackage[export]{adjustbox}
 
 \usetikzlibrary{shapes,arrows}
 
@@ -71,7 +70,7 @@ This method was implemented in code using the \texttt{gdesc()} function, which t
 
 At each iteration, the function updates the estimate of the minimum, appends to the array \texttt{xylist} the value of the updated point and to the array \texttt{fxy} the value of the function in correspondence of that updated point. At convergence, the algorithm returns the final estimate and the two lists \texttt{xylist} and \texttt{fxy}.
 
-Results are then plotted using the \texttt{plot\_traj()} and \texttt{plot\_fxy()} functions. The first creates a new 3D figure, defines a triangular grid inside the domain $\mathcal{D}$ of the function (keeping distance $\delta$ from the domain boundaries and with the given step) and plots both the function and the sequence of weights onto that plot. The global minimum is also drawn on the obtained graph. The second function performs a simple 2D plot operation of the given vector.
+Results are then plotted using the \texttt{plot\_traj()} and \texttt{plot\_fxy()} functions. The first creates a new figure, defines a triangular grid inside the domain $\mathcal{D}$ of the function (keeping distance $\delta$ from the domain boundaries and with the given number of points) and plots both the contours of the function at the given levels and the sequence of weights onto that plot. The second function performs a simple plot operation of the given vector.
 
 Obtained results are shown in figures \ref{gd_graph} and \ref{gd_fval}. Those were computed starting from the initial point $ (x_0, y_0) = [\begin{matrix} 0.90348 & 0.03794 \end{matrix}] $, decreasing the value of $\eta$ to 0.01 in order not to make the point jump outside $\mathcal{D}$ and using $\epsilon = 10^{-6}$.
 
@@ -86,27 +85,29 @@ This method was implemented in code using the \texttt{newton()} function, which 
 \pagebreak
 
 \begin{figure}[H]
-\includegraphics[width=1.2\linewidth,center]{gd_graph.pdf}
+\centering
+\includegraphics[width=.7\linewidth]{gd_graph.pdf}
 \caption{Convergence using gradient descent method}
 \label{gd_graph}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=.6\linewidth]{gd_fval.pdf}
+\includegraphics[width=.7\linewidth]{gd_fval.pdf}
 \caption{Decrease of $f$-values using gradient descent method}
 \label{gd_fval}
 \end{figure}
 
 \begin{figure}[H]
-\includegraphics[width=1.2\linewidth,center]{nm_graph.pdf}
+\centering
+\includegraphics[width=.7\linewidth]{nm_graph.pdf}
 \caption{Convergence using Newton's method}
 \label{nm_graph}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=.6\linewidth]{nm_fval.pdf}
+\includegraphics[width=.7\linewidth]{nm_fval.pdf}
 \caption{Decrease of $f$-values using Newton's method}
 \label{nm_fval}
 \end{figure}

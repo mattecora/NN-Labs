@@ -62,40 +62,44 @@ def newton(xy0, eta, eps):
     return xy, xylist, fxy
 
 def plot_traj(xylist, xymin):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    plt.figure()
 
-    # Create a triangular domain and plot the function
+    # Create a triangular domain
     xv = []
     yv = []
     delta = 0.025
-    step = 0.01
+    numpts = 100
 
-    x = delta
-    while x < 1 - delta:
-        y = delta
-        while y < 1 - delta - x:
-            xv.append(float(x))
-            yv.append(float(y))
-            y = y + step
-        x = x + step
+    xv = np.linspace(delta, 1-delta, numpts)
+    yv = np.linspace(delta, 1-delta, numpts)
+    zv = np.ndarray((len(xv), len(yv)))
 
-    xv = np.array(xv)
-    yv = np.array(yv)
+    for i in range(len(xv)):
+        for j in range(len(yv)):
+            if (yv[j] < 1 - delta - xv[i]):
+                zv[i][j] = f(xv[i], yv[j])
+            else:
+                zv[i][j] = np.inf
 
-    ax.plot_trisurf(xv, yv, f(xv,yv), color=(1, 1, 1, 0.25))
-    ax.plot([x[0][0] for x in xylist], [x[1][0] for x in xylist], [f(x[0][0], x[1][0]) for x in xylist], marker="x", linestyle="dotted")
-    ax.plot([xymin[0]], [xymin[1]], [f(xymin[0], xymin[1])], marker="o", fillstyle="none")
+    # Plot the function contours
+    contours = plt.contour(xv, yv, zv, levels=[round(f(xymin[0], xymin[1]), 1), 3.5, 4, 4.5, 5])
+    plt.clabel(contours)
 
-    ax.set_title("Convergence of $(x,y)$ to the minimum of $f$")
-    fig.tight_layout()
+    # Plot the trajectory
+    plt.plot([x[0][0] for x in xylist], [x[1][0] for x in xylist], marker="x", linestyle="dotted")
+
+    # Plot the domain limit
+    plt.plot([0, 1], [1, 0], color="black", linestyle="dashed")
+    
+    # Set graph characteristics
+    plt.axis([0, 1, 0, 1])
+    plt.title("Convergence of $(x,y)$ to the minimum of $f$")
 
 def plot_fxy(fxy):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.plot(fxy)
-    ax.set_title("Value of $f(x,y)$ for increasing epochs")
-    ax.grid()
+    plt.figure()
+    plt.plot(fxy)
+    plt.title("Value of $f(x,y)$ for increasing epochs")
+    plt.grid()
 
 # Set algorithm parameters
 eta = 0.01
@@ -105,6 +109,7 @@ xymin = np.array([1/3, 1/3])
 # Select random initial point
 x0 = np.random.uniform(0, 1)
 y0 = np.random.uniform(0, 1-x0)
+print(f(1/3, 1/3))
 print("Initial point: ({}, {})".format(x0, y0))
 print("GD update term in (x0, y0):\n{}".format(gradf(x0, y0)))
 print("NM update term in (x0, y0):\n{}".format(np.linalg.inv(hessf(x0, y0)) @ gradf(x0, y0)))
