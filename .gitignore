@@ -1,3 +1,8 @@
 .vscode
 *.synctex.gz
 *.idx*-ubyte
+*.npy
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
