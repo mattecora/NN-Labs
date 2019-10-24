@@ -49,7 +49,7 @@ def train(x, d, W, phi, der_phi, eta, eps, epoch_limit):
     epochs = 0
     errors = [error(x, d, W, phi)]
 
-    while epochs < epoch_limit:
+    while epochs < epoch_limit and errors[epochs] >= eps:
         # Increment epochs
         epochs = epochs + 1
 
@@ -63,11 +63,9 @@ def train(x, d, W, phi, der_phi, eta, eps, epoch_limit):
         errors.append(error(x, d, W, phi))
         print("Epoch {}: eta = {}, err = {}".format(epochs, eta, errors[epochs]))
 
-        # Decrease eta if necessary and break if update is small enough
+        # Decrease eta if necessary
         if errors[epochs] > errors[epochs - 1]:
             eta = 0.9 * eta
-        elif errors[epochs - 1] - errors[epochs] < eps:
-            break
 
     return epochs, errors
 
@@ -96,21 +94,27 @@ n = np.random.uniform(-1/10, 1/10, size=n_samples)
 d = np.sin(20 * x) + 3 * x + n
 
 # Define network initial weights
-sigma = 1/5
 n_hidden = 24
-W1 = np.random.normal(0, sigma, size=(n_hidden, 2))
-W2 = np.random.normal(0, sigma, size=(1, n_hidden + 1))
+sigma1 = np.sqrt(1/n_hidden)
+sigma2 = 1
+W1 = np.random.normal(0, sigma1, size=(n_hidden, 2))
+W2 = np.random.normal(0, sigma2, size=(1, n_hidden + 1))
 
-# Run the gradient descent method
+# Run the training algorithm
 eta = 0.1
-eps = 1e-9
-epoch_limit = 100000
+eps = 0.1
+epoch_limit = 5000
 
 epochs, errors = train(x, d, [W1, W2], [phi1, phi2], [der_phi1, der_phi2], eta, eps, epoch_limit)
 
 # Plot the fitting and the errors
 plot_fit(x, d, [W1, W2], [phi1, phi2])
 plot_errors(errors)
+
+# Save weights and errors to file
+np.save("w1.npy", W1)
+np.save("w2.npy", W2)
+np.save("err.npy", errors)
 
 # Show plots
 plt.show()
