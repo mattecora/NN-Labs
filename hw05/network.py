@@ -44,8 +44,9 @@ class Network:
         epochs = 0
 
         errors = [self.errfunc(train_data, train_labels)]
-        tests = [self.test(test_data, test_labels)]
-        print("Epoch {}: eta = {}, err = {}, test = {}".format(epochs, eta, errors[epochs], tests[epochs]))
+        training_accuracy = [self.test(train_data, train_labels)]
+        test_accuracy = [self.test(test_data, test_labels)]
+        print("Epoch {}: eta = {}, err = {}, train = {}, test = {}".format(epochs, eta, errors[epochs], training_accuracy[epochs], test_accuracy[epochs]))
 
         while epochs < epoch_limit and errors[epochs] >= eps:
             # Increment epochs
@@ -59,8 +60,9 @@ class Network:
 
             # Register the error
             errors.append(self.errfunc(train_data, train_labels))
-            tests.append(self.test(test_data, test_labels))
-            print("Epoch {}: eta = {}, err = {}, test = {}".format(epochs, eta, errors[epochs], tests[epochs]))
+            training_accuracy.append(self.test(train_data, train_labels))
+            test_accuracy.append(self.test(test_data, test_labels))
+            print("Epoch {}: eta = {}, err = {}, train = {}, test = {}".format(epochs, eta, errors[epochs], training_accuracy[epochs], test_accuracy[epochs]))
 
             # Decrease eta if necessary
             if errors[epochs] > errors[epochs - 1]:
@@ -70,9 +72,10 @@ class Network:
             # Save weights and errors to file
             np.save("weights_{}.npy".format(save_suffix), self.weights)
             np.save("errors_{}.npy".format(save_suffix), errors)
-            np.save("test_{}.npy".format(save_suffix), tests)
+            np.save("trainacc_{}.npy".format(save_suffix), training_accuracy)
+            np.save("testacc_{}.npy".format(save_suffix), test_accuracy)
 
-        return epochs, errors, tests
+        return epochs, errors, training_accuracy, test_accuracy
 
     def test(self, test_data, test_labels):
         # Count classification errors on the test set

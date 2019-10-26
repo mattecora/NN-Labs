@@ -169,12 +169,12 @@ Once the first network was trained and tested, the other two networks were consi
 
 \begin{table}[h]
     \centering
-    \begin{tabular}{|c|c|c|}
+    \begin{tabular}{|c|c|c|c|c|}
     \hline
-    Network \# & Epochs to convergence & Test set accuracy \\ \hline
-    1 & 67 & 97.64\% \\ \hline
-    2 & 44 & 97.90\% \\ \hline
-    3 & 26 & 97.84\% \\ \hline
+    Network \# & Epochs & Training time (s) & Training set accuracy & Test set accuracy \\ \hline
+    1 & 67 & 3486 & 99.46\% & 97.64\% \\ \hline
+    2 & 44 & 7991 & 99.54\% & 97.90\% \\ \hline
+    3 & 26 & 2303 & 99.49\% & 97.84\% \\ \hline
     \end{tabular}
     \caption{Training results for the tested networks}
     \label{net_results}
@@ -182,13 +182,20 @@ Once the first network was trained and tested, the other two networks were consi
 
 As it can be seen, the three networks have very similar performance when evaluated on the test set, but they substantially differ in their training performance. As it could be expected, the network requiring the most epochs to train was the first one, due to the more limited number of neurons it contains. Increasing the number of neurons in a single hidden layer presents some improvements (the number of epochs to convergence decreases), although this is only a theoretical improvement since the actual time needed to train such a network is considerably longer than in the previous case (matrix multiplication has is a problem with more than quadratic complexity in the dimensions of the matrices). The overall best network, both in terms of epochs to convergence and effective training time, is the 3-layer one, showing as expected more abstraction capabilities of the others.
 
-Figures \ref{errors_plot} and \ref{tests_plot} show respectively the value of the error function and the test set accuracy for increasing number of epochs for the three networks (epoch 0 is excluded because significantly out-of-scale). It is possible to notice how the performances of network 3 are consistently better than the ones of network 2, which in turn has better performances than network 1, throughout the entire learning process.
+Figures \ref{errors_plot}, \ref{trains_plot} and \ref{tests_plot} show respectively the value of the error function, the training set and the test set accuracy for increasing number of epochs for the three networks (epoch 0 is excluded because significantly out-of-scale). It is possible to notice how the performances of network 3 are consistently better than the ones of network 2, which in turn has better performances than network 1, throughout the entire learning process.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=.7\linewidth]{errors.pdf}
     \caption{Error function for increasing number of epochs}
     \label{errors_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\linewidth]{trains.pdf}
+    \caption{Training set accuracy for increasing number of epochs}
+    \label{trains_plot}
 \end{figure}
 
 \begin{figure}[H]

@@ -1,3 +1,4 @@
+from time import time
 import numpy as np
 
 from network import Network
@@ -35,4 +36,7 @@ eps = 0.01
 epoch_limit = 100
 
 net = Network([W1, W2], [phi1, phi2], [der_phi1, der_phi2])
-epochs, errors, tests = net.train(train_samples, train_labels, test_samples, test_labels, eta, eps, epoch_limit, "200-10")
+
+start_time = time()
+epochs, errors, training_accuracy, test_accuracy = net.train(train_samples, train_labels, test_samples, test_labels, eta, eps, epoch_limit, "200-10")
+print(time() - start_time)
