@@ -6,6 +6,8 @@
 \usepackage{listings}
 \usepackage{tikz}
 \usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
@@ -89,7 +91,7 @@ For the purpose of the exercise, the networks to be tested have been chosen acco
     
     $$ E = \frac{1}{|\mathcal{S}|} \sum_{i = 1}^{|\mathcal{S}|} || d_i - y_{i,L} ||^2 $$
     
-    \item \emph{Other implementation heuristics}:
+    \item Other implementation heuristics:
     
     \begin{itemize}
         \item \emph{Stochastic update}: online learning has been used for all training tasks;
@@ -129,7 +131,7 @@ In order to properly represent the different networks, a \texttt{Network} class 
 
     \end{itemize}
     
-    \item \texttt{errfunc()}: it calculates the value of the error function for the entire training set (mean squared error), averaging the squared value of the norm of the difference between the desired outputs and the effective outputs (computed through the \texttt{feedforward()} method):
+    \item \texttt{error()}: it calculates the value of the error function for the entire training set (mean squared error), averaging the squared value of the norm of the difference between the desired outputs and the effective outputs (computed through the \texttt{feedforward()} method):
     
     $$ E = \frac{1}{|\mathcal{S}|} \sum_{i = 1}^{|\mathcal{S}|} || d_i - y_{i,L} ||^2 $$
     
@@ -170,7 +172,126 @@ In order to properly represent the different networks, a \texttt{Network} class 
 
 \end{itemize}
 
-Pseudocode for all the described procedures is presented in the following.
+\begin{algorithm}[H]
+    \caption{Feed-forward procedure}
+    \label{ffalg}
+    \begin{algorithmic}
+    
+    \Function{Feed-Forward}{$network, x_i$}
+        \State \Comment{Initialization}
+        \State $v \gets $ \Call{Empty-List}{}
+        \State $y \gets $ \Call{Empty-List}{}
+        \State $y[0] \gets x_i$
+        \State \Comment{Computation of $v$ and $y$ values}
+        \For{$i = 1, \dots, L$}
+            \State $v[i] \gets network.W[i] \left[ \begin{matrix} 1 & y[i] \end{matrix} \right]^T$
+            \State $y[i + 1] \gets network.\phi[i](v[i])$
+        \EndFor
+        \State \Return $v, y$
+    \EndFunction
+
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \caption{Backpropagation procedure}
+    \label{bpalg}
+    \begin{algorithmic}
+    
+    \Function{Backpropagate}{$network, x_i, d_i$}
+        \State \Comment{Initialization}
+        \State $v, y \gets network.\Call{Feed-Forward}{x_i}$
+        \State $\delta \gets $ \Call{Empty-List}{}
+        \State $\nabla E \gets $ \Call{Empty-List}{}
+        \State \Comment{Computation of $\delta_i$ values}
+        \State $\delta[L] \gets (d_i - y[L]) * network.\phi'[L](v[L])$
+        \For{$i = L - 1, \dots, 1$}
+            \State $\delta[i] \gets \left( network.\underline{W[i + 1]} \right)^T \delta[i + 1] * network.\phi'[i](v[i])$
+        \EndFor
+        \State \Comment{Computation of $\nabla E$ components}
+        \For{$i = 1, \dots, L$}
+            \State $\nabla E[i] = -\delta[i] \left[ \begin{matrix} 1 & y_{i - 1} \end{matrix} \right]^T$
+        \EndFor
+        \State \Return $v, y$
+    \EndFunction
+    
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \caption{Error procedure}
+    \label{eralg}
+    \begin{algorithmic}
+    
+    \Function{Error}{$network, x, d$}
+        \State $e \gets 0$
+        \For{$i = 1, \dots, n$}
+            \State $v, y \gets network.\Call{Feed-Forward}{x[i]}$
+            \State $e \gets e + (d[i] - y[L])^2$
+        \EndFor
+        \State \Return $e / n$
+    \EndFunction
+    
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \caption{Test procedure}
+    \label{ttalg}
+    \begin{algorithmic}
+    
+    \Function{Test}{$network, x, d$}
+        \State $c \gets 0$
+        \For{$i = 1, \dots, n$}
+            \State $v, y \gets network.\Call{Feed-Forward}{x[i]}$
+            \If{$\argmax{d[i]} = \argmax{y[L]}$}
+                \State $c \gets c + 1$
+            \EndIf
+        \EndFor
+        \State \Return $c / n$
+    \EndFunction
+    
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \caption{Training procedure}
+    \label{tralg}
+    \begin{algorithmic}
+    
+    \Function{Train}{$network, x_{train}, d_{train}, x_{test}, d_{test}, \eta, \epsilon, \lambda$}
+        \State \Comment{Initialization}
+        \State $epochs \gets 0$
+        \State $errors \gets $ \Call{Empty-List}{}
+        \State $trainacc \gets $ \Call{Empty-List}{}
+        \State $testacc \gets $ \Call{Empty-List}{}
+        \State $errors[0] \gets network.\Call{Error}{x_{train}, d_{train}}$
+        \State $trainacc[0] \gets network.\Call{Error}{x_{train}, d_{train}}$
+        \State $testacc[0] \gets network.\Call{Error}{x_{test}, d_{test}}$
+        \State \Comment{Main weights update loop}
+        \While{$epochs < \lambda \wedge errors[epochs] > \epsilon$}
+            \State $epochs \gets epochs + 1$
+            \State \Comment{Compute update terms and update weights}
+            \For{$i = 1, \dots, n$}
+                \State $\nabla E \gets network.\Call{Backpropagate}{x_{train}[i], d_{train}[i]}$
+                \For{$j = 1, \dots, L$}
+                    \State $network.W[j] \gets network.W[j] - \eta \nabla E[j]$
+                \EndFor
+            \EndFor
+            \State \Comment{Error and accuracy registration}
+            \State $errors[epochs] \gets network.\Call{Error}{x_{train}, d_{train}}$
+            \State $trainacc[epochs] \gets network.\Call{Error}{x_{train}, d_{train}}$
+            \State $testacc[epochs] \gets network.\Call{Error}{x_{test}, d_{test}}$
+            \State \Comment{Update of $\eta$}
+            \If{$errors[epochs] > errors[epochs - 1]$}
+                \State $\eta \gets 0.9 \eta$
+            \EndIf
+        \EndWhile
+        \State \Return $epochs, errors, trainacc, testacc$
+    \EndFunction
+    
+    \end{algorithmic}
+\end{algorithm}
 
 \subsection{Tested networks and results}
 
@@ -224,23 +345,44 @@ Figures \ref{errors_plot}, \ref{trains_plot} and \ref{tests_plot} show respectiv
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{errors.pdf}
-    \caption{Error function for increasing number of epochs}
-    \label{errors_plot}
+    \includegraphics[width=\linewidth]{net1.pdf}
+    \caption{Performances of network \#1}
+    \label{net1}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{trains.pdf}
-    \caption{Training set accuracy for increasing number of epochs}
-    \label{trains_plot}
+    \includegraphics[width=\linewidth]{net2.pdf}
+    \caption{Performances of network \#2}
+    \label{net2}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{tests.pdf}
-    \caption{Test set accuracy for increasing number of epochs}
-    \label{tests_plot}
+    \includegraphics[width=\linewidth]{net3.pdf}
+    \caption{Performances of network \#3}
+    \label{net3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{net4.pdf}
+    \caption{Performances of network \#4}
+    \label{net4}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{net5.pdf}
+    \caption{Performances of network \#5}
+    \label{net5}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{net6.pdf}
+    \caption{Performances of network \#6}
+    \label{net6}
 \end{figure}
 
 \subsection{Complete Python code}

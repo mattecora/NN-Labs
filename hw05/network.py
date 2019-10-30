@@ -35,7 +35,7 @@ class Network:
 
         return dEW
 
-    def errfunc(self, data, labels):
+    def error(self, data, labels):
         # Compute the value of the error function
         return sum([(np.linalg.norm(labels[i] - self.feedforward(data[i])[1][-1])) ** 2 for i in range(len(data))]) / len(data)
 
@@ -43,7 +43,7 @@ class Network:
         # Run the gradient descent method
         epochs = 0
 
-        errors = [self.errfunc(train_data, train_labels)]
+        errors = [self.error(train_data, train_labels)]
         training_accuracy = [self.test(train_data, train_labels)]
         test_accuracy = [self.test(test_data, test_labels)]
         print("Epoch {}: eta = {}, err = {}, train = {}, test = {}".format(epochs, eta, errors[epochs], training_accuracy[epochs], test_accuracy[epochs]))
@@ -59,7 +59,7 @@ class Network:
                     self.weights[j] = self.weights[j] - eta * dEW[j]
 
             # Register the error
-            errors.append(self.errfunc(train_data, train_labels))
+            errors.append(self.error(train_data, train_labels))
             training_accuracy.append(self.test(train_data, train_labels))
             test_accuracy.append(self.test(test_data, test_labels))
             print("Epoch {}: eta = {}, err = {}, train = {}, test = {}".format(epochs, eta, errors[epochs], training_accuracy[epochs], test_accuracy[epochs]))
