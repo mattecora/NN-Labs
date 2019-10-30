@@ -1,3 +1,4 @@
+from sys import argv
 from time import time
 import numpy as np
 
@@ -23,20 +24,27 @@ n_test_samples, _,  _, test_samples = idx_images_parse("../hw02/t10k-images.idx3
 _, test_labels = idx_labels_parse("../hw02/t10k-labels.idx1-ubyte")
 print("Test set loaded.")
 
-# Define network initial weights
-n_hidden = 100
-sigma1 = np.sqrt(1 / (n_rows * n_cols + 1))
-sigma2 = np.sqrt(1 / (n_hidden + 1))
-W1 = np.random.normal(0, sigma1, size=(n_hidden, n_rows * n_cols + 1))
-W2 = np.random.normal(0, sigma2, size=(10, n_hidden + 1))
+# Parse number of neurons from command line
+neurons = [n_rows * n_cols] + [int(argv[i]) for i in range(1, len(argv))] + [10]
+
+# Define standard deviations for each layer
+sigma = [np.sqrt(1 / (neurons[i] + 1)) for i in range(len(neurons) - 1)]
+
+# Initialize weights for each layer
+W = [np.random.normal(0, sigma[i], size=(neurons[i + 1], neurons[i] + 1)) for i in range(len(sigma))]
+
+# Define activation functions for each layer
+phi = [phi1] * (len(W) - 1) + [phi2]
+der_phi = [der_phi1] * (len(W) - 1) + [der_phi2]
+
+# Create the network
+net = Network(W, phi, der_phi)
 
 # Train the network
 eta = 0.01
 eps = 0.01
 epoch_limit = 100
 
-net = Network([W1, W2], [phi1, phi2], [der_phi1, der_phi2])
-
 start_time = time()
-epochs, errors, training_accuracy, test_accuracy = net.train(train_samples, train_labels, test_samples, test_labels, eta, eps, epoch_limit, "100-10")
-print(time() - start_time)
+epochs, errors, training_accuracy, test_accuracy = net.train(train_samples, train_labels, test_samples, test_labels, eta, eps, epoch_limit, " ".join(f"{n}" for n in neurons))
+print(f"Elapsed time: {time() - start_time}")

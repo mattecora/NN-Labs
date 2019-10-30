@@ -16,7 +16,8 @@ def idx_images_parse(filename):
         n_cols = np.fromfile(f, dtype=">u4", count=1)[0]
 
         # Parse samples
-        samples = [np.fromfile(f, dtype=">u1", count=n_rows*n_cols).reshape(n_rows * n_cols, 1) / 255 for i in range(n_samples)]
+        samples = [np.fromfile(f, dtype=">u1", count=n_rows*n_cols).reshape(n_rows * n_cols, 1) for i in range(n_samples)]
+        samples = [(s - np.mean(s)) / 255 for s in samples]
 
     return n_samples, n_rows, n_cols, samples
 

@@ -63,13 +63,41 @@ With respect to the functions used for the second homework, some preprocessing i
 
 \begin{itemize}
 
-    \item Input pixel values have been normalized to 1, by dividing each component by 255 (they are stored as 8-bits unsigned integers);
+    \item Input pixel values have been normalized to 1, by dividing each component by 255 (they are stored as 8-bits unsigned integers), after subtracting them their mean value (so that they have zero mean);
     
     \item Labels have been mapped on their binary vector representation, using the \texttt{label\_to\_array()} function from homework 2.
 
 \end{itemize}
 
 Scaling the inputs allows for avoiding the need of training large weights for the network, while label mapping is useful since it is not necessary to reconstruct the binary representation each time it is needed (it is computationally easier to extract the argmax, when necessary).
+
+\subsection{Hyperparameters selection}
+
+For the purpose of the exercise, the networks to be tested have been chosen according to the following parameters:
+
+\begin{itemize}
+    
+    \item \emph{Network topology}: as for the network topology, all the considered networks are either 2-layers or 3-layers. The choice of not using more than 3 layers has been dictated both by the computational complexity that the training of multiple layers yields and by the fact that, in any case, a 2-layers network is already capable of approximating any function with arbitrary precision. The addition of a second hidden layer is motivated by the willingness to compare the training performance of multiple-layers networks with respect to the 2-layers ones.
+    
+    \item \emph{Digit representation}: classified digits have been represented as in homework 2; for this reason, all the tested networks present 10 neurons in the output layer, and the class prediction is obtained by extracting the argmax of the network output. This representation is in fact handy because it allows also to assign a form of "confidence score" to the different predictions that the network returns (i.e. the network classifies the input pattern as an $i$ digit with a confidence given by $y_i$).
+    
+    \item \emph{Activation functions}: as for activation functions, it has been chosen to utilize hyperbolic tangents for the hidden layers and sigmoid for the output layer. Hyperbolic tangents have been chosen for their well-known properties that make them suitable for the usage in neural networks (e.g. they are odd functions), while sigmoids have been used in order to saturate the network output in a positive range between 0 and 1, allowing to interpretate results as a sort of "probabilistic" confidence score (not really true since they do not sum to 1).
+    
+    \item \emph{Learning rates}: for the sake of simplicity, all neurons in the networks make use of the same learning rate $\eta$, initially set to a reasonable $\eta = 0.01$. A dynamic update mechanism of the learning rate has also been implemented, decrementing the value of $\eta$ by a factor of 0.9 each time it comes across an increase of the error function from an epoch to the following.
+    
+    \item \emph{Energy function}: the mean squared error measure has been chosen as the energy function for all the tested networks:
+    
+    $$ E = \frac{1}{|\mathcal{S}|} \sum_{i = 1}^{|\mathcal{S}|} || d_i - y_{i,L} ||^2 $$
+    
+    \item \emph{Other implementation heuristics}:
+    
+    \begin{itemize}
+        \item \emph{Stochastic update}: online learning has been used for all training tasks;
+        \item \emph{Inputs normalization}: inputs have been scaled in the range $[0,1]$ to avoid saturation;
+        \item \emph{Weights initialization}: weight matrices have been initialized using random values drawn from a normal distribution with $\mu = 0$ and $\sigma = m^{-1}$, where $m$ represents the number of inputs of each specific layer.
+    \end{itemize}
+
+\end{itemize}
 
 \subsection{Network construction and training}
 
@@ -101,7 +129,7 @@ In order to properly represent the different networks, a \texttt{Network} class 
 
     \end{itemize}
     
-    \item \texttt{errfunc()}: it calculates the value of the error function for the entire training set, averaging the squared value of the norm of the difference between the desired outputs and the effective outputs (computed through the \texttt{feedforward()} method):
+    \item \texttt{errfunc()}: it calculates the value of the error function for the entire training set (mean squared error), averaging the squared value of the norm of the difference between the desired outputs and the effective outputs (computed through the \texttt{feedforward()} method):
     
     $$ E = \frac{1}{|\mathcal{S}|} \sum_{i = 1}^{|\mathcal{S}|} || d_i - y_{i,L} ||^2 $$
     
@@ -142,65 +170,75 @@ In order to properly represent the different networks, a \texttt{Network} class 
 
 \end{itemize}
 
-All the described operations have been implemented using the opportune functions and operators provided by the Python language and the NumPy library.
+Pseudocode for all the described procedures is presented in the following.
 
 \subsection{Tested networks and results}
 
-For the sake of the exercise, three networks have been tested, whose main parameters are presented in table \ref{net_params}.
+For the sake of the exercise, six networks have been tested, whose main parameters are presented in table \ref{net_params}.
 
 \begin{table}[h]
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
     \hline
     Network \# & Layers & $n_1$ & $n_2$ & $n_3$ & $\phi_1$ & $\phi_2$ & $\phi_3$ & $\eta$ & $\epsilon$ & Epoch limit \\ \hline
-    1 & 2 & 100 & 10 & - & tanh & sigmoid & - & 0.01 & 0.01 & 5000 \\ \hline
-    2 & 2 & 200 & 10 & - & tanh & sigmoid & - & 0.01 & 0.01 & 5000 \\ \hline
-    3 & 3 & 100 & 100 & 10 & tanh & tanh & sigmoid & 0.01 & 0.01 & 5000 \\ \hline
+    1 & 2 & 10 & 10 & - & tanh & sigmoid & - & 0.01 & 0.01 & 100 \\ \hline
+    2 & 2 & 100 & 10 & - & tanh & sigmoid & - & 0.01 & 0.01 & 100 \\ \hline
+    3 & 2 & 200 & 10 & - & tanh & sigmoid & - & 0.01 & 0.01 & 100 \\ \hline
+    4 & 3 & 10 & 10 & 10 & tanh & tanh & sigmoid & 0.01 & 0.01 & 100 \\ \hline
+    5 & 3 & 100 & 10 & 10 & tanh & tanh & sigmoid & 0.01 & 0.01 & 100 \\ \hline
+    6 & 3 & 100 & 100 & 10 & tanh & tanh & sigmoid & 0.01 & 0.01 & 100 \\ \hline
     \end{tabular}
     \caption{Parameters of the tested networks}
     \label{net_params}
 \end{table}
 
-In all three cases, the weight matrices have been initialized using random values drawn from a normal distribution with $\mu = 0$ and $\sigma = m^{-1}$, where $m$ represents the number of inputs of each specific layer.
+For the selection of the number of neurons for each layer of each network, it has been chosen to start from the network used for this classification task in homework 2. In that case, we made use of a single-layer network with 10 neurons, capable of achieving an accuracy of about 85\% when trained using the whole training set.
 
-For the first network, it has been chosen to use two layers since it is proven that any two-layer network is able to approximate any given function with arbitrary precision; the choice of the number of neurons in the hidden layer has been dictated by the necessity of keeping the computational cost of the training procedure within an acceptable range. The choice of the sigmoid activation function for the output layer has been driven by the fact that its output range is entirely positive (it does not make sense, in this context, to have negative output values).
+For this reason, a first try was performed, using a 2-layers network having the same number of neurons (10) for both the hidden and the output layer. Despite such network has not been able to converge to the configured maximum error value within the configured number of epochs, the training performances of such network already show a sensible improvement over the network used in homework 2 (93.79\% accuracy for the training set, 91.79\% accuracy for the test set).
 
-Once the first network was trained and tested, the other two networks were considered for comparison as variations of the first having a total of 100 additional neurons, respectively in a single and in two hidden layers. Results of the training process are shown in table \ref{net_results}.
+Given that the precision of the approximation of a 2-layer network may be improved by introducing additional neurons, it has then been chosen to test two additional 2-layers networks, having respectively 100 and 200 neurons in their hidden layer. These networks performed much better, reaching convergence in 63 and 43 epochs respectively with around 99.5\% training set accuracy and almost 98\% test set accuracy. The downside for that has been the significant increase in training time, especially for the network with 200 elements in the hidden layer.
+
+For the 3-layers network, a similar process has been followed. Initially, it has been chosen to test the performance of a network having 10 neurons in both hidden layers, the training of which again reached the configured epoch limit; as expected, the performance of such network are better than the ones of the initial 2-layers network due to the increased abstraction capabilities introduced by the additional hidden layer, but still not in line with the 95\% test set accuracy target (95.44\% for the training set, 92.87\% for the test set).
+
+Again, two additional 3-layers networks have been tested, increasing the number of neurons respectively in the first and in both hidden layers. Those networks were the ones that yielded the best performances in terms of training epochs and time overall, reaching accuracy levels comparable to the ones of 2-layers networks, with a reduction of about half for the number of training epochs and of 3 to 4 times for the training time.
+
+A summary of the results of the training process are shown in table \ref{net_results}. The overall best network, in terms of ratio between accuracy and training time is the 100-10-10 one, although the 100-100-10 converges in a more limited number of epochs.
 
 \begin{table}[h]
     \centering
     \begin{tabular}{|c|c|c|c|c|}
     \hline
     Network \# & Epochs & Training time (s) & Training set accuracy & Test set accuracy \\ \hline
-    1 & 67 & 3486 & 99.46\% & 97.64\% \\ \hline
-    2 & 44 & 7991 & 99.54\% & 97.90\% \\ \hline
-    3 & 26 & 2303 & 99.49\% & 97.84\% \\ \hline
+    1 & 100+ & 913 & 93.79\% & 91.79\% \\ \hline
+    2 & 63 & 3486 & 99.46\% & 97.62\% \\ \hline
+    3 & 43 & 7704 & 99.54\% & 97.90\% \\ \hline
+    4 & 100+ & 1130 & 95.44\% & 92.87\% \\ \hline
+    5 & 29 & 1366 & 99.48\% & 97.54\% \\ \hline
+    6 & 24 & 2303 & 99.50\% & 98.00\% \\ \hline
     \end{tabular}
     \caption{Training results for the tested networks}
     \label{net_results}
 \end{table}
 
-As it can be seen, the three networks have very similar performance when evaluated on the test set, but they substantially differ in their training performance. As it could be expected, the network requiring the most epochs to train was the first one, due to the more limited number of neurons it contains. Increasing the number of neurons in a single hidden layer presents some improvements (the number of epochs to convergence decreases), although this is only a theoretical improvement since the actual time needed to train such a network is considerably longer than in the previous case (matrix multiplication has is a problem with more than quadratic complexity in the dimensions of the matrices). The overall best network, both in terms of epochs to convergence and effective training time, is the 3-layer one, showing as expected more abstraction capabilities of the others.
-
-Figures \ref{errors_plot}, \ref{trains_plot} and \ref{tests_plot} show respectively the value of the error function, the training set and the test set accuracy for increasing number of epochs for the three networks (epoch 0 is excluded because significantly out-of-scale). It is possible to notice how the performances of network 3 are consistently better than the ones of network 2, which in turn has better performances than network 1, throughout the entire learning process.
+Figures \ref{errors_plot}, \ref{trains_plot} and \ref{tests_plot} show respectively the value of the error function, the training set and the test set accuracy for increasing number of epochs for the considered networks (epoch 0 is excluded because significantly out-of-scale). It is possible to notice how the performances of network 3 are consistently better than the ones of network 2, which in turn has better performances than network 1, throughout the entire learning process.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.7\linewidth]{errors.pdf}
+    \includegraphics[width=\linewidth]{errors.pdf}
     \caption{Error function for increasing number of epochs}
     \label{errors_plot}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.7\linewidth]{trains.pdf}
+    \includegraphics[width=\linewidth]{trains.pdf}
     \caption{Training set accuracy for increasing number of epochs}
     \label{trains_plot}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.7\linewidth]{tests.pdf}
+    \includegraphics[width=\linewidth]{tests.pdf}
     \caption{Test set accuracy for increasing number of epochs}
     \label{tests_plot}
 \end{figure}
@@ -215,16 +253,8 @@ Figures \ref{errors_plot}, \ref{trains_plot} and \ref{tests_plot} show respectiv
 
 \lstinputlisting[basicstyle=\ttfamily\scriptsize]{network.py}
 
-\subsubsection{Training of network 1}
+\subsubsection{Training of the networks}
 
-\lstinputlisting[basicstyle=\ttfamily\scriptsize]{net1.py}
-
-\subsubsection{Training of network 2}
-
-\lstinputlisting[basicstyle=\ttfamily\scriptsize]{net2.py}
-
-\subsubsection{Training of network 3}
-
-\lstinputlisting[basicstyle=\ttfamily\scriptsize]{net3.py}
+\lstinputlisting[basicstyle=\ttfamily\scriptsize]{hw5.py}
 
 \end{document}

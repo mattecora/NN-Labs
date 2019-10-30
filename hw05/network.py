@@ -70,7 +70,7 @@ class Network:
 
         if save_suffix is not None:
             # Save weights and errors to file
-            np.save("weights_{}.npy".format(save_suffix), self.weights)
+            #np.save("weights_{}.npy".format(save_suffix), self.weights)
             np.save("errors_{}.npy".format(save_suffix), errors)
             np.save("trainacc_{}.npy".format(save_suffix), training_accuracy)
             np.save("testacc_{}.npy".format(save_suffix), test_accuracy)
