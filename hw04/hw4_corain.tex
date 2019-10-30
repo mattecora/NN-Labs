@@ -89,13 +89,13 @@ This suggests the procedure shown in algorithm \ref{bpalg} to implement the back
     \label{bpalg}
     \begin{algorithmic}
     
-    \Function{Backpropagate}{$x_i, d, W, \phi, \phi'$}
+    \Function{Backpropagate}{$x_i, d_i, W, \phi, \phi'$}
         \State \Comment{Initialization}
         \State $v, y \gets $ \Call{Feed-Forward}{$x_i, W, \phi$}
         \State $\delta \gets $ \Call{Empty-List}{}
         \State $\nabla E \gets $ \Call{Empty-List}{}
         \State \Comment{Computation of $\delta_i$ values}
-        \State $\delta[L] \gets (d - y[L]) * \phi'[L](v[L])$
+        \State $\delta[L] \gets (d_i - y[L]) * \phi'[L](v[L])$
         \For{$i = L - 1, \dots, 1$}
             \State $\delta[i] \gets \left( W^*[i + 1] \right)^T \delta[i + 1] * \phi'[i](v[i])$
         \EndFor
@@ -147,6 +147,8 @@ In which the derivative term is computed through the backpropagation procedure. 
     \item The maximum number of epochs $\lambda$ is reached.
 \end{itemize}
 
+It has been chosen to stop the epochs when the value of the error function falls below a certain threshold instead of considering the decrease of energy from an epoch to the following because of the unpredictability of the values of the latter. There is no guarantee that a small delta would be obtained when the fit is good: in fact, 
+
 This algorithm also implements the $\eta$ update rule, which reduces the learning rate by a factor of 0.9 when it detects that the error increases from an epoch to the next.
 
 \begin{algorithm}[h]
@@ -193,7 +195,11 @@ The described algorithms were implemented using the Python programming language 
     \item Procedure \textsc{Train} is implemented in the \texttt{train()} function.
 \end{itemize}
 
-The initial weights matrices \texttt{W1} and \texttt{W2} for the network have been chosen according to the weight initialization heuristic, which prescribes to draw the starting values from a normal distribution, with mean $\mu = 0$ and variance $\sigma^2 = \frac{1}{m}$, where $m$ is the number of neurons in the considered layer. In our case, we have $m_1 = 24$ and $m_2 = 1$, so reasonable values for the standard deviation are $\sigma_1 = \sqrt{\frac{1}{24}}$ and $\sigma_2 = 1$. As for the training parameters, the following values have been chosen:
+The initial weights matrices \texttt{W1} and \texttt{W2} for the network have been chosen according to the weight initialization heuristic, which prescribes to draw the starting values from a normal distribution, with mean $\mu = 0$ and variance $\sigma^2 = \frac{1}{m}$, where $m$ is the number of inputs for the neurons in the considered layer (i.e. the number of neurons in the previous layer). In our case, we have $m_1 = 2$ and $m_2 = 25$, so reasonable values for the standard deviation are:
+
+$$ \sigma_1 = \sqrt{\frac{1}{2}} = 0.7071, \sigma_2 = \sqrt{\frac{1}{25}} = 0.2 $$
+
+As for the training parameters, the following values have been chosen:
 
 $$ \eta = 0.1, \epsilon = 0.01, \lambda = 5000 $$
 
@@ -207,26 +213,22 @@ The training procedure has then been executed, using as parameters:
 
 \subsection{Results}
 
-The training algorithm was able to converge to a good enough fit in 2997 epochs, at the end of which the value of the error function is about:
+The training algorithm was able to converge to a good enough fit in 4085 epochs. Results have been plotted by making use of the \texttt{plot\_fit()} and \texttt{plot\_errors()} functions. The first is used to plot the function fitted from the generated dataset, obtained by evaluating the output of the network (through the \texttt{feedforward()} function) on a evenly-spaced set of $x$ values (generated using the \texttt{linspace()} function of the NumPy library). The second simply plots the contents of the passed \texttt{errors} list for increasing number of epochs.
 
-$$ E = 0.009995 $$
-
-Results have been plotted by making use of the \texttt{plot\_fit()} and \texttt{plot\_errors()} functions. The first is used to plot the function fitted from the generated dataset, obtained by evaluating the output of the network (through the \texttt{feedforward()} function) on a evenly-spaced set of $x$ values (generated using the \texttt{linspace()} function of the NumPy library). The second simply plots the contents of the passed \texttt{errors} list for increasing number of epochs.
-
-The obtained fitting is shown in figure \ref{fit_9}; figure \ref{err_9} shows instead the value of the error function for increasing epochs.
+The obtained fitting is shown in figure \ref{fit}; figure \ref{err} shows instead the value of the error function for increasing epochs.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\linewidth]{fit_9.pdf}
+\includegraphics[width=\linewidth]{fit.pdf}
 \caption{Fitting obtained using backpropagation and $\epsilon = 0.01$}
-\label{fit_9}
+\label{fit}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=.7\linewidth]{err_9.pdf}
+\includegraphics[width=.7\linewidth]{err.pdf}
 \caption{Error for increasing number of epochs ($\epsilon = 0.01$)}
-\label{err_9}
+\label{err}
 \end{figure}
 
 The obtained fit is close enough to the data points, without exhibiting any major overfitting-related problem (e.g. oscillations in the vicinity of data points). As expected, the most prominent improvements in terms of the reduction of the error function are shown in the first epochs, while the profile becomes almost flat when the number of epochs increases (reduction is limited also by the decreasing value of $\eta$).

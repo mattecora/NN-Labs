@@ -19,7 +19,7 @@ def feedforward(x, W, phi, i):
 
     # Compute local fields and outputs
     for j in range(len(W)):
-        v.append(W[j] @ np.insert(y[j], 0, 1).reshape(len(y[j]) + 1, 1))
+        v.append(W[j] @ np.concatenate(([1], y[j]), axis=None).reshape(len(y[j]) + 1, 1))
         y.append(phi[j](v[j]).reshape(len(v[j]), 1))
 
     return v, y
@@ -37,7 +37,7 @@ def backpropagate(x, d, W, phi, der_phi, i):
 
     # Compute the gradient
     for j in range(len(W)):
-        dEW[j] = -delta[j] @ np.insert(y[j], 0, 1).reshape(1, len(y[j]) + 1)
+        dEW[j] = -delta[j] @ np.concatenate(([1], y[j]), axis=None).reshape(1, len(y[j]) + 1)
 
     return dEW
 
@@ -95,14 +95,14 @@ d = np.sin(20 * x) + 3 * x + n
 
 # Define network initial weights
 n_hidden = 24
-sigma1 = np.sqrt(1/n_hidden)
-sigma2 = 1
+sigma1 = np.sqrt(1/2)
+sigma2 = np.sqrt(1 / (n_hidden + 1))
 W1 = np.random.normal(0, sigma1, size=(n_hidden, 2))
 W2 = np.random.normal(0, sigma2, size=(1, n_hidden + 1))
 
 # Run the training algorithm
 eta = 0.1
-eps = 0.1
+eps = 0.01
 epoch_limit = 5000
 
 epochs, errors = train(x, d, [W1, W2], [phi1, phi2], [der_phi1, der_phi2], eta, eps, epoch_limit)
@@ -110,11 +110,6 @@ epochs, errors = train(x, d, [W1, W2], [phi1, phi2], [der_phi1, der_phi2], eta, 
 # Plot the fitting and the errors
 plot_fit(x, d, [W1, W2], [phi1, phi2])
 plot_errors(errors)
-
-# Save weights and errors to file
-np.save("w1.npy", W1)
-np.save("w2.npy", W2)
-np.save("err.npy", errors)
 
 # Show plots
 plt.show()
