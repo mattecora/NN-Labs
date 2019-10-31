@@ -76,9 +76,9 @@ For the first layer of the network, the input $y_0$ is the input $x$ of the netw
 
 The partial results coming from the $v$ and $y$ vectors can then be used to compute the update terms for the gradient descent algorithm (to be precise, to estimate the value of the derivatives $\frac{\partial E}{\partial W_i}, \forall i$). Let us define the quantities $\delta_i, i = 1, \dots, L$ as:
 
-$$ \delta_i = \begin{cases} (d - y_L) \cdot \phi'(v_L) & \text{if } i = L \\ \left( W^*_{i + 1} \right)^T \delta_{i + 1} \cdot \phi'(v_i) & \text{if } i = 1, \dots, L - 1 \end{cases} $$
+$$ \delta_i = \begin{cases} (d - y_L) \cdot \phi'(v_L) & \text{if } i = L \\ \left( \underline{W_{i + 1}} \right)^T \delta_{i + 1} \cdot \phi'(v_i) & \text{if } i = 1, \dots, L - 1 \end{cases} $$
 
-Where the $\cdot$ symbol denotes a dot product operation and $W^*_i$ denotes the $W_i$ matrix to which the first row has been removed (the one related to the bias contributions). The theoretical results of the backpropagation algorithm prove that, once the $\delta_i$ quantities are defined, it is possible to compute the partial derivatives of $E$ as:
+Where the $\cdot$ symbol denotes a dot product operation and $\underline{W_i}$ denotes the $W_i$ matrix to which the first row has been removed (the one related to the bias contributions). The theoretical results of the backpropagation algorithm prove that, once the $\delta_i$ quantities are defined, it is possible to compute the partial derivatives of $E$ as:
 
 $$ \frac{\partial E}{\partial W_i} = - \delta_i \left[ \begin{matrix} 1 \\ y_{i - 1} \end{matrix} \right] $$
 
@@ -97,7 +97,7 @@ This suggests the procedure shown in algorithm \ref{bpalg} to implement the back
         \State \Comment{Computation of $\delta_i$ values}
         \State $\delta[L] \gets (d_i - y[L]) * \phi'[L](v[L])$
         \For{$i = L - 1, \dots, 1$}
-            \State $\delta[i] \gets \left( W^*[i + 1] \right)^T \delta[i + 1] * \phi'[i](v[i])$
+            \State $\delta[i] \gets \left( \underline{W[i + 1]} \right)^T \delta[i + 1] * \phi'[i](v[i])$
         \EndFor
         \State \Comment{Computation of $\nabla E$ components}
         \For{$i = 1, \dots, L$}
@@ -147,10 +147,6 @@ In which the derivative term is computed through the backpropagation procedure. 
     \item The maximum number of epochs $\lambda$ is reached.
 \end{itemize}
 
-It has been chosen to stop the epochs when the value of the error function falls below a certain threshold instead of considering the decrease of energy from an epoch to the following because of the unpredictability of the values of the latter. There is no guarantee that a small delta would be obtained when the fit is good: in fact, 
-
-This algorithm also implements the $\eta$ update rule, which reduces the learning rate by a factor of 0.9 when it detects that the error increases from an epoch to the next.
-
 \begin{algorithm}[h]
     \caption{Training procedure}
     \label{tralg}
@@ -184,6 +180,10 @@ This algorithm also implements the $\eta$ update rule, which reduces the learnin
     \end{algorithmic}
 \end{algorithm}
 
+It has been chosen to stop the epochs when the value of the error function falls below a certain threshold instead of considering the decrease of energy from an epoch to the following because of the unpredictability of the values of the latter. There is no guarantee that a small delta would be obtained when the fit is already good, or vice versa: as it will be shown in the energy graph, in fact, in the considered running example the profile of the energy function presents multiple flat zones, in which the energy decrease is minimal (up to $10^{-8}$, for some iterations), also for relatively high values of the energy function. This justifies the usage of the value of the error function to define the stopping condition of the algorithm rather than its relative difference, since otherwise there would be the possibility for the algorithm to stop in correspondence of one of the aforementioned high-energy plateaus.
+
+This algorithm also implements the $\eta$ update rule, which reduces the learning rate by a factor of 0.9 when it detects that the error increases from an epoch to the next.
+
 \subsection{Implementation details}
 
 The described algorithms were implemented using the Python programming language in conjunction with the NumPy scientific computing library. In particular, we have that:
@@ -208,7 +208,7 @@ The training procedure has then been executed, using as parameters:
 \begin{itemize}
     \item The \texttt{x} and \texttt{d} vectors generated as explained before;
     \item The lists \texttt{W = [W1, W2]}, \texttt{phi = [phi1, phi2]} and \texttt{der\_phi = [der\_phi1, der\_phi2]}, containing respectively the two weight matrices, the two activation functions and their two derivatives (passed as function pointers);
-    \item The three training parameters \texttt{eta = 0.1}, \texttt{eps = 0.01} and \texttt{lambda = 100000}.
+    \item The three training parameters \texttt{eta = 0.1}, \texttt{eps = 0.01} and \texttt{epoch\_limit = 5000}.
 \end{itemize}
 
 \subsection{Results}

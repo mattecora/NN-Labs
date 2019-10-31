@@ -50,7 +50,7 @@ def plot_fit(x, d, W, phi):
 def plot_errors(errors):
     plt.figure()
     plt.plot(errors)
-    plt.title("Errors for increasing epochs")
+    plt.title("Energy for increasing epochs")
     plt.grid()
 
 # Plot and show results
