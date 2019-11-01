@@ -117,9 +117,41 @@ In the context of Hopfield networks, synchronous update prescribes that all the 
 
 $$ x \leftarrow \phi(Wx + \theta) $$
 
-Where $W$ is the weight matrix of the network and $\theta$ the bias vector. Applying the aforementioned update rule to each possible state of the network, it is possible to compute the successor state for each possible state of the network. As an example, the derivation of the state transition for $(-1, -1, -1)$ is shown:
+Where $W$ is the weight matrix of the network and $\theta$ the bias vector. Applying the aforementioned update rule to each possible state of the network, it is possible to compute the successor state for each possible state of the network. Derivations are shown below:
 
-$$ x' = \phi(Wx + \theta) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \\ 2 & 0 & -1 \\ -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ -1 \\ -1 \end{matrix} \right] + \left[ \begin{matrix} 0.5 \\ 0.5 \\ 0.5 \end{matrix} \right] \right) = \phi \left( \left[ \begin{matrix} -0.5 \\ -0.5 \\ +1.5 \end{matrix} \right] \right) = \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] $$
+\begin{itemize}
+    \item $x = [\begin{matrix} -1 & -1 & -1 \end{matrix}]^T$:
+    
+    $$ x' = \phi(Wx + \theta) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \\ 2 & 0 & -1 \\ -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ -1 \\ -1 \end{matrix} \right] + \left[ \begin{matrix} 0.5 \\ 0.5 \\ 0.5 \end{matrix} \right] \right) = \phi \left( \left[ \begin{matrix} -0.5 \\ -0.5 \\ +1.5 \end{matrix} \right] \right) = \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] $$
+
+    \item $x = [\begin{matrix} -1 & -1 & +1 \end{matrix}]^T$:
+    
+    $$ x' = \phi(Wx + \theta) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \\ 2 & 0 & -1 \\ -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] + \left[ \begin{matrix} 0.5 \\ 0.5 \\ 0.5 \end{matrix} \right] \right) = \phi \left( \left[ \begin{matrix} -2.5 \\ -2.5 \\ +3.5 \end{matrix} \right] \right) = \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] $$
+
+    \item $x = [\begin{matrix} -1 & +1 & -1 \end{matrix}]^T$:
+    
+    $$ x' = \phi(Wx + \theta) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \\ 2 & 0 & -1 \\ -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ +1 \\ -1 \end{matrix} \right] + \left[ \begin{matrix} 0.5 \\ 0.5 \\ 0.5 \end{matrix} \right] \right) = \phi \left( \left[ \begin{matrix} +3.5 \\ -0.5 \\ -0.5 \end{matrix} \right] \right) = \left[ \begin{matrix} +1 \\ -1 \\ -1 \end{matrix} \right] $$
+
+    \item $x = [\begin{matrix} -1 & +1 & +1 \end{matrix}]^T$:
+    
+    $$ x' = \phi(Wx + \theta) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \\ 2 & 0 & -1 \\ -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ +1 \\ +1 \end{matrix} \right] + \left[ \begin{matrix} 0.5 \\ 0.5 \\ 0.5 \end{matrix} \right] \right) = \phi \left( \left[ \begin{matrix} +1.5 \\ -2.5 \\ +1.5 \end{matrix} \right] \right) = \left[ \begin{matrix} +1 \\ -1 \\ +1 \end{matrix} \right] $$
+
+    \item $x = [\begin{matrix} +1 & -1 & -1 \end{matrix}]^T$:
+    
+    $$ x' = \phi(Wx + \theta) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \\ 2 & 0 & -1 \\ -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ -1 \\ -1 \end{matrix} \right] + \left[ \begin{matrix} 0.5 \\ 0.5 \\ 0.5 \end{matrix} \right] \right) = \phi \left( \left[ \begin{matrix} -0.5 \\ +3.5 \\ -0.5 \end{matrix} \right] \right) = \left[ \begin{matrix} -1 \\ +1 \\ -1 \end{matrix} \right] $$
+
+    \item $x = [\begin{matrix} +1 & -1 & +1 \end{matrix}]^T$:
+    
+    $$ x' = \phi(Wx + \theta) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \\ 2 & 0 & -1 \\ -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ -1 \\ +1 \end{matrix} \right] + \left[ \begin{matrix} 0.5 \\ 0.5 \\ 0.5 \end{matrix} \right] \right) = \phi \left( \left[ \begin{matrix} -2.5 \\ +1.5 \\ +1.5 \end{matrix} \right] \right) = \left[ \begin{matrix} -1 \\ +1 \\ +1 \end{matrix} \right] $$
+
+    \item $x = [\begin{matrix} +1 & +1 & -1 \end{matrix}]^T$:
+    
+    $$ x' = \phi(Wx + \theta) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \\ 2 & 0 & -1 \\ -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] + \left[ \begin{matrix} 0.5 \\ 0.5 \\ 0.5 \end{matrix} \right] \right) = \phi \left( \left[ \begin{matrix} +3.5 \\ +3.5 \\ -3.5 \end{matrix} \right] \right) = \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] $$
+    
+    \item $x = [\begin{matrix} +1 & +1 & +1 \end{matrix}]^T$:
+    
+    $$ x' = \phi(Wx + \theta) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \\ 2 & 0 & -1 \\ -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ +1 \\ +1 \end{matrix} \right] + \left[ \begin{matrix} 0.5 \\ 0.5 \\ 0.5 \end{matrix} \right] \right) = \phi \left( \left[ \begin{matrix} +1.5 \\ +1.5 \\ -0.5 \end{matrix} \right] \right) = \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] $$
+\end{itemize}
 
 Similar computations have been performed for all the other states, obtaining the state transition diagram shown in figure \ref{sync}.
 
@@ -130,7 +162,7 @@ Similar computations have been performed for all the other states, obtaining the
     \label{sync}
 \end{figure}
 
-As it can be seen, this form of update may generate instability, since there are some states that are never able to converge to a stable configuration. In this case, the \emph{urstates} of the network are $(-1, -1, -1)$ and $(+1, +1, +1)$ (they have no predecessor states), while the \emph{stable states} of the network are $(-1, -1, +1)$ and $(+1, +1, -1)$ (they have no successor states, excluding themselves).
+As it can be seen, this form of update may generate instability, since there are some states that are never able to converge to a stable configuration. In this case, the \emph{urstates} of the network are $[\begin{matrix} -1 & -1 & -1 \end{matrix}]^T$ and $[\begin{matrix} +1 & +1 & +1 \end{matrix}]^T$ (they have no predecessor states), while the \emph{stable states} of the network are $[\begin{matrix} -1 & -1 & +1 \end{matrix}]^T$ and $[\begin{matrix} +1 & +1 & -1 \end{matrix}]^T$ (they have no successor states, excluding themselves).
 
 \subsection{Asynchronous update}
 
@@ -138,13 +170,73 @@ In the context of Hopfield networks, asynchronous update prescribes that the com
 
 $$ x_i \leftarrow W_i x + \theta_i, i = 1, \dots, m $$
 
-Where $W_i$ denotes the $i$-th row of the weight matrix and $\theta_i$ the $i$-th component of the bias vector. In the case of asynchronous update, therefore, different updates are possible on different components, potentially making the network transition to different states. As an example, we again show the derivation of the successor state for $(-1, -1, -1)$, in the three cases in which we are updating the first, second and third component:
+Where $W_i$ denotes the $i$-th row of the weight matrix and $\theta_i$ the $i$-th component of the bias vector. In the case of asynchronous update, therefore, different updates are possible on different components, potentially making the network transition to different states. Derivations in the case of independent update of the single components are shown below:
+
+\begin{itemize}
+\item $x = [\begin{matrix} -1 & -1 & -1 \end{matrix}]^T$:
 
 $$ x'_{1} = \phi(W_1 x + \theta_1) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ -1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( -0.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ -1 \\ -1 \end{matrix} \right] $$
 
 $$ x'_{2} = \phi(W_2 x + \theta_2) = \phi \left( \left[ \begin{matrix} 2 & 0 & -1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ -1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( -0.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ -1 \\ -1 \end{matrix} \right] $$
 
 $$ x'_{3} = \phi(W_3 x + \theta_3) = \phi \left( \left[ \begin{matrix} -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ -1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( 1.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] $$
+
+\item $x = [\begin{matrix} -1 & -1 & +1 \end{matrix}]^T$:
+
+$$ x'_{1} = \phi(W_1 x + \theta_1) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( -2.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] $$
+
+$$ x'_{2} = \phi(W_2 x + \theta_2) = \phi \left( \left[ \begin{matrix} 2 & 0 & -1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( -2.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] $$
+
+$$ x'_{3} = \phi(W_3 x + \theta_3) = \phi \left( \left[ \begin{matrix} -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( +3.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] $$
+
+\item $x = [\begin{matrix} -1 & +1 & -1 \end{matrix}]^T$:
+
+$$ x'_{1} = \phi(W_1 x + \theta_1) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ +1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( +3.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] $$
+
+$$ x'_{2} = \phi(W_2 x + \theta_2) = \phi \left( \left[ \begin{matrix} 2 & 0 & -1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ +1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( -0.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ -1 \\ -1 \end{matrix} \right] $$
+
+$$ x'_{3} = \phi(W_3 x + \theta_3) = \phi \left( \left[ \begin{matrix} -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ +1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( -0.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ +1 \\ -1 \end{matrix} \right] $$
+
+\item $x = [\begin{matrix} -1 & +1 & +1 \end{matrix}]^T$:
+
+$$ x'_{1} = \phi(W_1 x + \theta_1) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ +1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( +1.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ +1 \\ +1 \end{matrix} \right] $$
+
+$$ x'_{2} = \phi(W_2 x + \theta_2) = \phi \left( \left[ \begin{matrix} 2 & 0 & -1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ +1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( -2.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] $$
+
+$$ x'_{3} = \phi(W_3 x + \theta_3) = \phi \left( \left[ \begin{matrix} -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} -1 \\ +1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( +1.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ +1 \\ +1 \end{matrix} \right] $$
+
+\item $x = [\begin{matrix} +1 & -1 & -1 \end{matrix}]^T$:
+
+$$ x'_{1} = \phi(W_1 x + \theta_1) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ -1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( -0.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ -1 \\ -1 \end{matrix} \right] $$
+
+$$ x'_{2} = \phi(W_2 x + \theta_2) = \phi \left( \left[ \begin{matrix} 2 & 0 & -1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ -1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( +3.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] $$
+
+$$ x'_{3} = \phi(W_3 x + \theta_3) = \phi \left( \left[ \begin{matrix} -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ -1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( -0.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ -1 \\ -1 \end{matrix} \right] $$
+
+\item $x = [\begin{matrix} +1 & -1 & +1 \end{matrix}]^T$:
+
+$$ x'_{1} = \phi(W_1 x + \theta_1) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ -1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( -2.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} -1 \\ -1 \\ +1 \end{matrix} \right] $$
+
+$$ x'_{2} = \phi(W_2 x + \theta_2) = \phi \left( \left[ \begin{matrix} 2 & 0 & -1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ -1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( +1.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ +1 \\ +1 \end{matrix} \right] $$
+
+$$ x'_{3} = \phi(W_3 x + \theta_3) = \phi \left( \left[ \begin{matrix} -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ -1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( +1.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ -1 \\ +1 \end{matrix} \right] $$
+
+\item $x = [\begin{matrix} +1 & +1 & -1 \end{matrix}]^T$:
+
+$$ x'_{1} = \phi(W_1 x + \theta_1) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( +3.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] $$
+
+$$ x'_{2} = \phi(W_2 x + \theta_2) = \phi \left( \left[ \begin{matrix} 2 & 0 & -1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( +3.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] $$
+
+$$ x'_{3} = \phi(W_3 x + \theta_3) = \phi \left( \left[ \begin{matrix} -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] + 0.5 \right) = \phi \left( -3.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] $$
+
+\item $x = [\begin{matrix} +1 & +1 & +1 \end{matrix}]^T$:
+
+$$ x'_{1} = \phi(W_1 x + \theta_1) = \phi \left( \left[ \begin{matrix} 0 & 2 & -1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ +1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( +1.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ +1 \\ +1 \end{matrix} \right] $$
+
+$$ x'_{2} = \phi(W_2 x + \theta_2) = \phi \left( \left[ \begin{matrix} 2 & 0 & -1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ +1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( +1.5 \right) = +1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ +1 \\ +1 \end{matrix} \right] $$
+
+$$ x'_{3} = \phi(W_3 x + \theta_3) = \phi \left( \left[ \begin{matrix} -1 & -1 & 1 \end{matrix} \right] \left[ \begin{matrix} +1 \\ +1 \\ +1 \end{matrix} \right] + 0.5 \right) = \phi \left( -0.5 \right) = -1 \Rightarrow x' = \left[ \begin{matrix} +1 \\ +1 \\ -1 \end{matrix} \right] $$
+\end{itemize}
 
 Applying the same process to all possible states of the network, a state diagram like the one shown in figure \ref{async} can be obtained.
 
@@ -155,6 +247,6 @@ Applying the same process to all possible states of the network, a state diagram
     \label{async}
 \end{figure}
 
-With respect to the synchronous case, it is possible to notice that this state transition model does not present any form of instability. In this case, the \emph{urstates} of the network are $(-1, +1, -1)$, $(+1, -1, -1)$, $(-1, +1, +1)$ and $(+1, -1, +1)$ (they have no predecessor states), while the \emph{stable states} of the network are unchanged, $(-1, -1, +1)$ and $(+1, +1, -1)$ (they have no successor states, excluding themselves).
+With respect to the synchronous case, it is possible to notice that this state transition model does not present any form of instability. In this case, the \emph{urstates} of the network are $[\begin{matrix} -1 & +1 & -1 \end{matrix}]^T$, $[\begin{matrix} +1 & -1 & -1 \end{matrix}]^T$, $[\begin{matrix} -1 & +1 & +1 \end{matrix}]^T$ and $[\begin{matrix} +1 & -1 & +1 \end{matrix}]^T$ (they have no predecessor states), while the \emph{stable states} of the network are unchanged, $[\begin{matrix} -1 & -1 & +1 \end{matrix}]^T$ and $[\begin{matrix} +1 & +1 & -1 \end{matrix}]^T$ (they have no successor states, excluding themselves).
 
 \end{document}
