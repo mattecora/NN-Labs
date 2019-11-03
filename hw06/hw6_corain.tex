@@ -162,7 +162,7 @@ Similar computations have been performed for all the other states, obtaining the
     \label{sync}
 \end{figure}
 
-As it can be seen, this form of update may generate instability, since there are some states that are never able to converge to a stable configuration. In this case, the \emph{urstates} of the network are $[\begin{matrix} -1 & -1 & -1 \end{matrix}]^T$ and $[\begin{matrix} +1 & +1 & +1 \end{matrix}]^T$ (they have no predecessor states), while the \emph{stable states} of the network are $[\begin{matrix} -1 & -1 & +1 \end{matrix}]^T$ and $[\begin{matrix} +1 & +1 & -1 \end{matrix}]^T$ (they have no successor states, excluding themselves).
+As it can be seen, this form of update may generate instability, since there are some states that are never able to converge to a stable configuration. In this case, the \emph{urstates} of the network are $[\begin{matrix} -1 & -1 & -1 \end{matrix}]^T$ and $[\begin{matrix} +1 & +1 & +1 \end{matrix}]^T$ (they have no predecessor states, including themselves), while the \emph{stable states} of the network are $[\begin{matrix} -1 & -1 & +1 \end{matrix}]^T$ and $[\begin{matrix} +1 & +1 & -1 \end{matrix}]^T$ (they have no successor states, excluding themselves).
 
 \subsection{Asynchronous update}
 
@@ -247,6 +247,6 @@ Applying the same process to all possible states of the network, a state diagram
     \label{async}
 \end{figure}
 
-With respect to the synchronous case, it is possible to notice that this state transition model does not present any form of instability. In this case, the \emph{urstates} of the network are $[\begin{matrix} -1 & +1 & -1 \end{matrix}]^T$, $[\begin{matrix} +1 & -1 & -1 \end{matrix}]^T$, $[\begin{matrix} -1 & +1 & +1 \end{matrix}]^T$ and $[\begin{matrix} +1 & -1 & +1 \end{matrix}]^T$ (they have no predecessor states), while the \emph{stable states} of the network are unchanged, $[\begin{matrix} -1 & -1 & +1 \end{matrix}]^T$ and $[\begin{matrix} +1 & +1 & -1 \end{matrix}]^T$ (they have no successor states, excluding themselves).
+With respect to the synchronous case, it is possible to notice that this state transition model does not present any form of instability. In this case, there are no \emph{urstates} (each state has at least itself as a predecessor), while the \emph{stable states} of the network are unchanged, $[\begin{matrix} -1 & -1 & +1 \end{matrix}]^T$ and $[\begin{matrix} +1 & +1 & -1 \end{matrix}]^T$ (they have no successor states, excluding themselves).
 
 \end{document}
