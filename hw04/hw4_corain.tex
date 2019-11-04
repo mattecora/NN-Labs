@@ -76,7 +76,7 @@ For the first layer of the network, the input $y_0$ is the input $x$ of the netw
 
 The partial results coming from the $v$ and $y$ vectors can then be used to compute the update terms for the gradient descent algorithm (to be precise, to estimate the value of the derivatives $\frac{\partial E}{\partial W_i}, \forall i$). Let us define the quantities $\delta_i, i = 1, \dots, L$ as:
 
-$$ \delta_i = \begin{cases} (d - y_L) \cdot \phi'(v_L) & \text{if } i = L \\ \left( \underline{W_{i + 1}} \right)^T \delta_{i + 1} \cdot \phi'(v_i) & \text{if } i = 1, \dots, L - 1 \end{cases} $$
+$$ \delta_i = \begin{cases} (d - y_L) \cdot \phi'(v_L) & \text{if } i = L \\ \underline{W_{i + 1}^T} \delta_{i + 1} \cdot \phi'(v_i) & \text{if } i = 1, \dots, L - 1 \end{cases} $$
 
 Where the $\cdot$ symbol denotes a dot product operation and $\underline{W_i}$ denotes the $W_i$ matrix to which the first row has been removed (the one related to the bias contributions). The theoretical results of the backpropagation algorithm prove that, once the $\delta_i$ quantities are defined, it is possible to compute the partial derivatives of $E$ as:
 
@@ -95,9 +95,9 @@ This suggests the procedure shown in algorithm \ref{bpalg} to implement the back
         \State $\delta \gets $ \Call{Empty-List}{}
         \State $\nabla E \gets $ \Call{Empty-List}{}
         \State \Comment{Computation of $\delta_i$ values}
-        \State $\delta[L] \gets (d_i - y[L]) * \phi'[L](v[L])$
+        \State $\delta[L] \gets (d_i - y[L]) \cdot \phi'[L](v[L])$
         \For{$i = L - 1, \dots, 1$}
-            \State $\delta[i] \gets \left( \underline{W[i + 1]} \right)^T \delta[i + 1] * \phi'[i](v[i])$
+            \State $\delta[i] \gets \left( \underline{W[i + 1]} \right)^T \delta[i + 1] \cdot \phi'[i](v[i])$
         \EndFor
         \State \Comment{Computation of $\nabla E$ components}
         \For{$i = 1, \dots, L$}
@@ -111,7 +111,7 @@ This suggests the procedure shown in algorithm \ref{bpalg} to implement the back
 
 \subsection{Error procedure}
 
-The error procedure is used to compute the value of the error function, given the current weights, the activation functions, the training samples and the associated desired outputs. Let us recall that the error function may be computed using the formula:
+The error procedure is used to compute the value of the error function, given the current weights, the activation functions, the training samples and the associated desired outputs. Let us consider the error function for this exercise to be defined as the mean squared error of the classification task:
 
 $$ E = \frac{1}{n} \sum_{i = 1}^{n} || d_i - y_{i,L} ||^2 $$
 
@@ -136,7 +136,7 @@ Where $n$ is the number of training samples ($n = 300$, in this case). Algorithm
 
 \subsection{Training procedure}
 
-The training procedure is the one that is effectively used to train the network, computing the update terms starting from the results of the backpropagation procedure. It implements a standard gradient descent method, in which weights are updated for each sample as:
+The training procedure is the one that is effectively used to train the network, updating the weights starting from the results of the backpropagation procedure. It implements a standard gradient descent method, in which weights are updated for each sample as:
 
 $$ W_i \leftarrow W_i - \eta \frac{\partial E}{\partial W_i}, i = 1, \dots, L $$
 
@@ -203,7 +203,7 @@ As for the training parameters, the following values have been chosen:
 
 $$ \eta = 0.1, \epsilon = 0.01, \lambda = 5000 $$
 
-The training procedure has then been executed, using as parameters:
+The training procedure has then been executed, passing it:
 
 \begin{itemize}
     \item The \texttt{x} and \texttt{d} vectors generated as explained before;
@@ -213,9 +213,7 @@ The training procedure has then been executed, using as parameters:
 
 \subsection{Results}
 
-The training algorithm was able to converge to a good enough fit in 4085 epochs. Results have been plotted by making use of the \texttt{plot\_fit()} and \texttt{plot\_errors()} functions. The first is used to plot the function fitted from the generated dataset, obtained by evaluating the output of the network (through the \texttt{feedforward()} function) on a evenly-spaced set of $x$ values (generated using the \texttt{linspace()} function of the NumPy library). The second simply plots the contents of the passed \texttt{errors} list for increasing number of epochs.
-
-The obtained fitting is shown in figure \ref{fit}; figure \ref{err} shows instead the value of the error function for increasing epochs.
+The training algorithm was able to converge to a good enough fit in 4085 epochs. Results have been plotted by making use of the \texttt{plot\_fit()} and \texttt{plot\_errors()} functions. The first is used to plot the function fitted from the generated dataset, obtained by evaluating the output of the network (through the \texttt{feedforward()} function) on a evenly-spaced array of $x$ values (generated using the \texttt{linspace()} function of the NumPy library). The second simply plots the contents of the passed \texttt{errors} list for increasing number of epochs. The obtained fit is shown in figure \ref{fit}; figure \ref{err} shows instead the value of the error function for increasing epochs.
 
 \begin{figure}[h]
 \centering
@@ -231,7 +229,7 @@ The obtained fitting is shown in figure \ref{fit}; figure \ref{err} shows instea
 \label{err}
 \end{figure}
 
-The obtained fit is close enough to the data points, without exhibiting any major overfitting-related problem (e.g. oscillations in the vicinity of data points). As expected, the most prominent improvements in terms of the reduction of the error function are shown in the first epochs, while the profile becomes almost flat when the number of epochs increases (reduction is limited also by the decreasing value of $\eta$).
+It is possible to notice that the fitting curve results to be quite close to the data points, without exhibiting any major overfitting-related problem (e.g. oscillations in the vicinity of data points). As expected, the most prominent improvements in terms of the reduction of the error function are shown in the first epochs, while the profile becomes almost flat when the number of epochs increases (when the reduction is limited also by the decreasing value of $\eta$).
 
 \subsection{Complete Python code}
 
