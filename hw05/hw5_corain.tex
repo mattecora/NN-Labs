@@ -37,8 +37,6 @@
 
 Data have been parsed from the images and label files using a variation of the functions defined in the second homework for this purpose. Specifically:
 
-In order to parse the images and labels files, two separate functions have been coded:
-
 \begin{itemize}
 
     \item Function \texttt{idx\_images\_parse()} is used to parse the images files encoded in the IDX format; it performs the following actions:
@@ -65,7 +63,7 @@ With respect to the functions used for the second homework, some preprocessing i
 
 \begin{itemize}
 
-    \item Input pixel values have been normalized to 1, by dividing each component by 255 (they are stored as 8-bits unsigned integers), after subtracting them their mean value (so that they have zero mean);
+    \item Input pixel values have been normalized by subtracting them their mean value and by dividing each component by 255, so that in the end they are distributed in range $[-1,1]$ (they are stored as 8-bits unsigned integers) with zero mean;
     
     \item Labels have been mapped on their binary vector representation, using the \texttt{label\_to\_array()} function from homework 2.
 
@@ -79,15 +77,15 @@ For the purpose of the exercise, the networks to be tested have been chosen acco
 
 \begin{itemize}
     
-    \item \emph{Network topology}: as for the network topology, all the considered networks are either 2-layers or 3-layers. The choice of not using more than 3 layers has been dictated both by the computational complexity that the training of multiple layers yields and by the fact that, in any case, a 2-layers network is already capable of approximating any function with arbitrary precision. The addition of a second hidden layer is motivated by the willingness to compare the training performance of multiple-layers networks with respect to the 2-layers ones.
+    \item \emph{Network topology}: as for the network topology, all the considered networks are either 2-layers or 3-layers. The choice of not using more than 3 layers has been dictated both by the computational complexity required for the training of multiple layers and by the fact that, in any case, a 2-layers network is already proven to be capable of approximating any function with arbitrary precision (although the usage of multiple-layers networks may result in better training performance).
     
-    \item \emph{Digit representation}: classified digits have been represented as in homework 2; for this reason, all the tested networks present 10 neurons in the output layer, and the class prediction is obtained by extracting the argmax of the network output. This representation is in fact handy because it allows also to assign a form of "confidence score" to the different predictions that the network returns (i.e. the network classifies the input pattern as an $i$ digit with a confidence given by $y_i$).
+    \item \emph{Digit representation}: classified digits have been represented as in homework 2; for this reason, all the tested networks present 10 neurons in the output layer, and the class prediction is obtained by extracting the argmax of the network output. This representation is handy because it allows also to assign a form of "confidence score" to the different predictions that the network returns (i.e. the network classifies the input pattern as $i$ with a $y_i$ confidence).
     
-    \item \emph{Activation functions}: as for activation functions, it has been chosen to utilize hyperbolic tangents for the hidden layers and sigmoid for the output layer. Hyperbolic tangents have been chosen for their well-known properties that make them suitable for the usage in neural networks (e.g. they are odd functions), while sigmoids have been used in order to saturate the network output in a positive range between 0 and 1, allowing to interpretate results as a sort of "probabilistic" confidence score (not really true since they do not sum to 1).
+    \item \emph{Activation functions}: as for activation functions, it has been chosen to utilize hyperbolic tangents for the hidden layers and sigmoid for the output layer. Hyperbolic tangents have been chosen for their well-known properties that make them suitable for the usage in neural networks (e.g. they are odd functions), while sigmoids have been used in order to saturate the network output in a positive range between 0 and 1, allowing to interpretate results as a sort of "probabilistic" confidence score (although they do not sum to 1).
     
-    \item \emph{Learning rates}: for the sake of simplicity, all neurons in the networks make use of the same learning rate $\eta$, initially set to a reasonable $\eta = 0.01$. A dynamic update mechanism of the learning rate has also been implemented, decrementing the value of $\eta$ by a factor of 0.9 each time it comes across an increase of the error function from an epoch to the following.
+    \item \emph{Learning rates}: for the sake of simplicity, all neurons in the networks make use of the same learning rate $\eta$, initially set to $\eta = 0.01$. A dynamic update mechanism of the learning rate has also been implemented, decrementing the value of $\eta$ by a factor of 0.9 each time it comes across an increase of the error function from an epoch to the following.
     
-    \item \emph{Energy function}: the mean squared error measure has been chosen as the energy function for all the tested networks:
+    \item \emph{Energy function}: the mean squared error measure has been chosen as the energy function for all the tested networks, in which the error is evaluated in terms of distance from the binary representation of the expected label:
     
     $$ E = \frac{1}{|\mathcal{S}|} \sum_{i = 1}^{|\mathcal{S}|} || d_i - y_{i,L} ||^2 $$
     
@@ -95,8 +93,8 @@ For the purpose of the exercise, the networks to be tested have been chosen acco
     
     \begin{itemize}
         \item \emph{Stochastic update}: online learning has been used for all training tasks;
-        \item \emph{Inputs normalization}: inputs have been scaled in the range $[0,1]$ to avoid saturation;
-        \item \emph{Weights initialization}: weight matrices have been initialized using random values drawn from a normal distribution with $\mu = 0$ and $\sigma = m^{-1}$, where $m$ represents the number of inputs of each specific layer.
+        \item \emph{Inputs normalization}: inputs have been normalized to avoid saturation as previously described;
+        \item \emph{Weights initialization}: weight matrices have been initialized using random values drawn from a normal distribution with $\mu = 0$ and $\sigma^2 = m^{-1}$, where $m$ represents the number of inputs of each specific layer.
     \end{itemize}
 
 \end{itemize}
@@ -123,7 +121,7 @@ In order to properly represent the different networks, a \texttt{Network} class 
         $$ \delta_L = (d - y_L) \cdot \phi'_L(v_L) $$
         $$ \delta_i = \underline{W_{i + 1}^T} \delta_{i + 1} \cdot \phi'_i(v_i), i = L - 1, \dots, 1 $$
 
-        Where the underline denotes the weight matrix in which the first row (the one related to the bias term) has been removed.
+        Where the underlining denotes the weight matrix in which the first row (the one related to the bias term) has been removed.
 
         \item In the third step, delta signals are used to compute the effective components of the desired gradient:
         
@@ -137,17 +135,17 @@ In order to properly represent the different networks, a \texttt{Network} class 
     
     \item \texttt{test()}: it calculates the accuracy of the network on the test set, by summing a value of 1 each time the classification is correct (that is, $ \argmax{y_{i,L}} = \argmax{d_i} $) and dividing by the number of test samples:
     
-    $$ a = \frac{1}{|\mathcal{T}|} \sum_{i = 1}^{|\mathcal{T}|} \alpha_i, \; \alpha_i = \begin{cases} 1 & \text{if } \argmax{y_{i,L}} = \argmax{d_i} \\ 0 & \text{otherwise} \end{cases} $$
+    $$ A = \frac{1}{|\mathcal{T}|} \sum_{i = 1}^{|\mathcal{T}|} \alpha_i, \; \alpha_i = \begin{cases} 1 & \text{if } \argmax{y_{i,L}} = \argmax{d_i} \\ 0 & \text{otherwise} \end{cases} $$
     
     \item \texttt{train()}: it performs a gradient descent, backpropagation-based training of the network; it takes as parameters:
     
     \begin{itemize}
 
         \item The training samples and labels;
-        \item The test samples and labels (to record the test set accuracy for increasing epochs);
+        \item The test samples and labels (to keep track of the test set accuracy for increasing epochs);
         \item The initial learning rate $\eta$;
         \item The target value of the error function $\epsilon$;
-        \item The batch size for the learning procedure;
+        \item The maximum number of training epochs;
         \item A string suffix to be used for storing computed quantities in appropriate files for later usage (e.g. plotting) without having to fully recompute them.
     
     \end{itemize}
@@ -156,15 +154,15 @@ In order to properly represent the different networks, a \texttt{Network} class 
 
     \begin{itemize}
         
-        \item It initializes the \texttt{errors} and \texttt{tests} lists with the initial values of the error function and of the test set accuracy;
+        \item It initializes the \texttt{errors}, \texttt{trainacc} and \texttt{testacc} lists with the initial values of the error function and of the training and test sets accuracy;
         
-        \item It enters the training loop, whose stopping conditions are expressed on the number of epochs (it has to be lower than the configured limit) and on the value of the error function (it has to be greater than the configured limit);
+        \item It enters the training loop, whose stopping conditions are expressed on the number of epochs (it has to be higher than the configured limit) and on the value of the error function (it has to be lower than the configured limit);
         
         \item It loops on the training samples, computing for each of them the value of $\nabla E$ through the \texttt{backpropagate()} method, then updates the weight matrices of the different layers using the standard gradient descent rule;
         
-        \item It registers the value of the error function and the accuracy on the test set for the current weights;
+        \item It registers the value of the error function and the accuracy on the training and test sets for the current weights;
         
-        \item If the value of the error function increases among two consecutive epochs, it reduces the learning rate of a factor of 0.9.
+        \item If the value of the error function increases among two consecutive epochs, it reduces the learning rate of a factor of 0.9;
         
         \item When the training loop is computed, the final weights and the lists of errors and accuracy values are saved to file and returned.
 
@@ -319,13 +317,13 @@ For this reason, a first try was performed, using a 2-layers network having the 
 
 Given that the precision of the approximation of a 2-layer network may be improved by introducing additional neurons, it has then been chosen to test two additional 2-layers networks, having respectively 100 and 200 neurons in their hidden layer. These networks performed much better, reaching convergence in 63 and 43 epochs respectively with around 99.5\% training set accuracy and almost 98\% test set accuracy. The downside for that has been the significant increase in training time, especially for the network with 200 elements in the hidden layer.
 
-For the 3-layers network, a similar process has been followed. Initially, it has been chosen to test the performance of a network having 10 neurons in both hidden layers, the training of which again reached the configured epoch limit; as expected, the performance of such network are better than the ones of the initial 2-layers network due to the increased abstraction capabilities introduced by the additional hidden layer, but still not in line with the 95\% test set accuracy target (95.44\% for the training set, 92.87\% for the test set).
+For the 3-layers network, a similar process has been followed. Initially, it has been chosen to test the performance of a network having 10 neurons in both hidden layers, the training of which again reached the configured epoch limit; as expected, the performance of such network are in any case better than the ones of the initial 2-layers network due to the increased abstraction capabilities introduced by the additional hidden layer, but still not in line with the 95\% test set accuracy target (95.44\% for the training set, 92.87\% for the test set).
 
-Again, two additional 3-layers networks have been tested, increasing the number of neurons respectively in the first and in both hidden layers. Those networks were the ones that yielded the best performances in terms of training epochs and time overall, reaching accuracy levels comparable to the ones of 2-layers networks, with a reduction of about half for the number of training epochs and of 3 to 4 times for the training time.
+Again, two additional 3-layers networks have been tested, increasing the number of neurons to 100 respectively in the first and in both hidden layers. Those networks were the ones that yielded the best performances in terms of training epochs and time overall, reaching accuracy levels comparable to the ones of 2-layers networks, but reducing the number of training epochs by half and the training time by three to four times.
 
-A summary of the results of the training process are shown in table \ref{net_results}. The overall best network, in terms of ratio between accuracy and training time is the 100-10-10 one, although the 100-100-10 converges in a more limited number of epochs.
+A summary of the results of the training process are shown in table \ref{net_results}. The overall best network, in terms of ratio between accuracy and training time is the fifth one, although the sixth converges in a more limited number of epochs. The figures in the following pages show the value of the error function and the accuracy for increasing number of epochs for the considered networks.
 
-\begin{table}[h]
+\begin{table}[H]
     \centering
     \begin{tabular}{|c|c|c|c|c|}
     \hline
@@ -341,47 +339,47 @@ A summary of the results of the training process are shown in table \ref{net_res
     \label{net_results}
 \end{table}
 
-Figures \ref{errors_plot}, \ref{trains_plot} and \ref{tests_plot} show respectively the value of the error function, the training set and the test set accuracy for increasing number of epochs for the considered networks (epoch 0 is excluded because significantly out-of-scale). It is possible to notice how the performances of network 3 are consistently better than the ones of network 2, which in turn has better performances than network 1, throughout the entire learning process.
+% \pagebreak
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
-    \includegraphics[width=\linewidth]{net1.pdf}
-    \caption{Performances of network \#1}
+    \includegraphics[width=.9\linewidth]{net1.pdf}
+    %\caption{Performances of network \#1}
     \label{net1}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
-    \includegraphics[width=\linewidth]{net2.pdf}
-    \caption{Performances of network \#2}
+    \includegraphics[width=.9\linewidth]{net2.pdf}
+    %\caption{Performances of network \#2}
     \label{net2}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[p]
     \centering
-    \includegraphics[width=\linewidth]{net3.pdf}
-    \caption{Performances of network \#3}
+    \includegraphics[width=.9\linewidth]{net3.pdf}
+    %\caption{Performances of network \#3}
     \label{net3}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[p]
     \centering
-    \includegraphics[width=\linewidth]{net4.pdf}
-    \caption{Performances of network \#4}
+    \includegraphics[width=.9\linewidth]{net4.pdf}
+    %\caption{Performances of network \#4}
     \label{net4}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[p]
     \centering
-    \includegraphics[width=\linewidth]{net5.pdf}
-    \caption{Performances of network \#5}
+    \includegraphics[width=.9\linewidth]{net5.pdf}
+    %\caption{Performances of network \#5}
     \label{net5}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[p]
     \centering
-    \includegraphics[width=\linewidth]{net6.pdf}
-    \caption{Performances of network \#6}
+    \includegraphics[width=.9\linewidth]{net6.pdf}
+    %\caption{Performances of network \#6}
     \label{net6}
 \end{figure}
 
