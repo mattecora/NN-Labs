@@ -59,18 +59,18 @@ $$ \min_{\substack{\alpha_1, \dots, \alpha_n \ge 0 \\ \scriptstyle \sum_{i = 1}^
 
 Let us define the solution vector as the vector of the quantities $\alpha_i$ we aim to find:
 
-$$ x = \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] $$
+$$ x = \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] \in \mathbb{R}^{n,1} $$
 
-Let us begin by considering the first term of our minimization problem to define matrix $q$; this has to satisfy the following equation:
+Let us first consider the first term of our minimization problem to define matrix $q$; this has to satisfy the following equation:
 
-$$ q^T x = q^T \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] = - \sum_{i = 1}^n \alpha_i \Rightarrow q = \left[ \begin{matrix} -1 \\ \vdots \\ -1 \end{matrix} \right] $$
+$$ q^T x = q^T \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] = - \sum_{i = 1}^n \alpha_i \Rightarrow q = \left[ \begin{matrix} -1 \\ \vdots \\ -1 \end{matrix} \right] \in \mathbb{R}^{n,1} $$
 
 Let us now consider the second term of our minimization problem to define matrix $P$; this has to satisfy the following equation:
 
 $$ \frac{1}{2} x^T P x = \frac{1}{2} \left[ \begin{matrix} \alpha_1 & \cdots & \alpha_n \end{matrix} \right] P \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] = \frac{1}{2} \sum_{i = 1}^n \sum_{j = 1}^n \alpha_i \alpha_j d_i d_j K(x_i, x_j) $$
-$$ \Rightarrow P = \left[ \begin{matrix} \alpha_1^2 K(x_1, x_1) & \cdots & \alpha_1 \alpha_n K(x_1, x_n) \\ \vdots & \ddots & \vdots \\ \alpha_n \alpha_1 K(x_n, x_1) & \cdots & \alpha_n^2 K(x_n, x_n) \end{matrix} \right] = \left[ \alpha_i \alpha_j K(x_i, x_j) \right]_{i,j = 1, \dots, n} $$
+$$ \Rightarrow P = \left[ \begin{matrix} \alpha_1^2 K(x_1, x_1) & \cdots & \alpha_1 \alpha_n K(x_1, x_n) \\ \vdots & \ddots & \vdots \\ \alpha_n \alpha_1 K(x_n, x_1) & \cdots & \alpha_n^2 K(x_n, x_n) \end{matrix} \right] \in \mathbb{R}^{n,n} $$
 
-Finally, as for the second optimization constraint ($Gx \le h$), this can be used to express our original constraint according to which $\alpha_1, \dots, \alpha_n \ge 0$ (or, equivalently, $-\alpha_1, \dots, -\alpha_n \le 0$). Specifically, a choice of matrices that can be used for expressing this requirement is:
+As for the first optimization constraint ($Gx \le h$), this can be used to express our original requirement according to which $\alpha_1, \dots, \alpha_n \ge 0$ (or, equivalently, $-\alpha_1, \dots, -\alpha_n \le 0$). Specifically, a choice of matrices that can be used for expressing this restriction is:
 
 $$ G = \left[ \begin{matrix} -1 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & -1 \end{matrix} \right] \in \mathbb{R}^{n,n}, h = \left[ \begin{matrix} 0 \\ \vdots \\ 0 \end{matrix} \right] \in \mathbb{R}^{n,1} $$
 
@@ -78,7 +78,7 @@ In fact:
 
 $$ Gx \le h \Rightarrow \left[ \begin{matrix} -1 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & -1 \end{matrix} \right] \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] \le \left[ \begin{matrix} 0 \\ \vdots \\ 0 \end{matrix} \right] \Rightarrow \begin{cases} -\alpha_1 \le 0 \\ \hfil \vdots \\ -\alpha_n \le 0 \end{cases} $$
 
-Finally, as for the second optimization constraint ($Ax = b$), this can be used to express our original constraint according to which $\sum_{i = 1}^n \alpha_i d_i = 0$. Specifically, a choice of matrices that can be used for expressing this requirement is:
+Finally, as for the second optimization constraint ($Ax = b$), this can be used to express our original requirement according to which $\sum_{i = 1}^n \alpha_i d_i = 0$. Specifically, a choice of matrices that can be used for expressing this restriction is:
 
 $$ A = \left[ \begin{matrix} d_1 & \cdots & d_n \end{matrix} \right] \in \mathbb{R}^{1,n} $$
 $$ b = [0] \in \mathbb{R} $$
