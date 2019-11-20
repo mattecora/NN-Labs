@@ -53,24 +53,24 @@ Where $K(x,y)$ denotes the chosen kernel function. This has the form of a quadra
 
 $$ \min_{\substack{Gx \le h \\ \scriptstyle Ax = b}}{\left( \frac{1}{2} x^T P x + q^T x \right)} $$
 
-Where $P, q, G, h, A, b$ are opportunely defined matrices and $x$ denotes the solution vector. What we need to do to solve our original problem, therefore, is to express it using the presented notation, which can be used by numerical calculus packages to find an appropriate solution. In order to do that, let us rewrite our original maximization problem as a minimization problem; since maximizing a function is equivalent to minimizing its opposite, this is simply obtained by changing the sign of the quantity inside the $\max$ operator:
+Where $P, q, G, h, A, b$ are opportunely defined matrices and $x$ denotes the solution vector. In order to solve our original problem, therefore, it is necessary to express it using the presented notation, which can be used by numerical calculus packages to find an appropriate solution. First, let us rewrite our original maximization problem as a minimization problem; since maximizing a function is equivalent to minimizing its opposite, this is simply obtained by changing the sign of the quantity inside the $\max$ operator:
 
 $$ \min_{\substack{\alpha_1, \dots, \alpha_n \ge 0 \\ \scriptstyle \sum_{i = 1}^n \alpha_i d_i = 0}}{\left( - \sum_{i = 1}^n \alpha_i + \frac{1}{2} \sum_{i = 1}^n \sum_{j = 1}^n \alpha_i \alpha_j d_i d_j K(x_i, x_j) \right)} $$
 
-Let us define the solution vector as the vector of the quantities $\alpha_i$ we aim to find:
+In this problem, the solution vector is represented by the vector of the quantities $\alpha_i$ we aim to find values for:
 
 $$ x = \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] \in \mathbb{R}^{n,1} $$
 
-Let us first consider the first term of our minimization problem to define matrix $q$; this has to satisfy the following equation:
+The first term of the expression to be minimized can be used to define matrix $q$; in fact, this has to satisfy the following equation:
 
-$$ q^T x = q^T \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] = - \sum_{i = 1}^n \alpha_i \Rightarrow q = \left[ \begin{matrix} -1 \\ \vdots \\ -1 \end{matrix} \right] \in \mathbb{R}^{n,1} $$
+$$ q^T x = q^T \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] = \sum_{i = 1}^n q_i \alpha_i = - \sum_{i = 1}^n \alpha_i \Rightarrow q = \left[ \begin{matrix} -1 \\ \vdots \\ -1 \end{matrix} \right] \in \mathbb{R}^{n,1} $$
 
-Let us now consider the second term of our minimization problem to define matrix $P$; this has to satisfy the following equation:
+The second term of the expression to be minimized can be used instead to define matrix $P$; in fact, this has to satisfy the following equation:
 
-$$ \frac{1}{2} x^T P x = \frac{1}{2} \left[ \begin{matrix} \alpha_1 & \cdots & \alpha_n \end{matrix} \right] P \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] = \frac{1}{2} \sum_{i = 1}^n \sum_{j = 1}^n \alpha_i \alpha_j d_i d_j K(x_i, x_j) $$
-$$ \Rightarrow P = \left[ \begin{matrix} \alpha_1^2 K(x_1, x_1) & \cdots & \alpha_1 \alpha_n K(x_1, x_n) \\ \vdots & \ddots & \vdots \\ \alpha_n \alpha_1 K(x_n, x_1) & \cdots & \alpha_n^2 K(x_n, x_n) \end{matrix} \right] \in \mathbb{R}^{n,n} $$
+$$ \frac{1}{2} x^T P x = \frac{1}{2} \left[ \begin{matrix} \alpha_1 & \cdots & \alpha_n \end{matrix} \right] P \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] = \frac{1}{2} \sum_{i = 1}^n \sum_{j = 1}^n \alpha_i \alpha_j p_{ij} = \frac{1}{2} \sum_{i = 1}^n \sum_{j = 1}^n \alpha_i \alpha_j d_i d_j K(x_i, x_j) $$
+$$ \Rightarrow P = \left[ \begin{matrix} d_1^2 K(x_1, x_1) & \cdots & d_1 d_n K(x_1, x_n) \\ \vdots & \ddots & \vdots \\ d_n d_1 K(x_n, x_1) & \cdots & d_n^2 K(x_n, x_n) \end{matrix} \right] \in \mathbb{R}^{n,n} $$
 
-As for the first optimization constraint ($Gx \le h$), this can be used to express our original requirement according to which $\alpha_1, \dots, \alpha_n \ge 0$ (or, equivalently, $-\alpha_1, \dots, -\alpha_n \le 0$). Specifically, a choice of matrices that can be used for expressing this restriction is:
+As for the first optimization constraint ($Gx \le h$), this can be used to express the original requirement according to which $\alpha_1, \dots, \alpha_n \ge 0$ (or, equivalently, $-\alpha_1, \dots, -\alpha_n \le 0$). Specifically, a choice of matrices that can be used for expressing this restriction is:
 
 $$ G = \left[ \begin{matrix} -1 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & -1 \end{matrix} \right] \in \mathbb{R}^{n,n}, h = \left[ \begin{matrix} 0 \\ \vdots \\ 0 \end{matrix} \right] \in \mathbb{R}^{n,1} $$
 
@@ -78,7 +78,7 @@ In fact:
 
 $$ Gx \le h \Rightarrow \left[ \begin{matrix} -1 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & -1 \end{matrix} \right] \left[ \begin{matrix} \alpha_1 \\ \vdots \\ \alpha_n \end{matrix} \right] \le \left[ \begin{matrix} 0 \\ \vdots \\ 0 \end{matrix} \right] \Rightarrow \begin{cases} -\alpha_1 \le 0 \\ \hfil \vdots \\ -\alpha_n \le 0 \end{cases} $$
 
-Finally, as for the second optimization constraint ($Ax = b$), this can be used to express our original requirement according to which $\sum_{i = 1}^n \alpha_i d_i = 0$. Specifically, a choice of matrices that can be used for expressing this restriction is:
+Finally, as for the second optimization constraint ($Ax = b$), this can be used to express the original requirement according to which $\sum_{i = 1}^n \alpha_i d_i = 0$. Specifically, a choice of matrices that can be used for expressing this restriction is:
 
 $$ A = \left[ \begin{matrix} d_1 & \cdots & d_n \end{matrix} \right] \in \mathbb{R}^{1,n} $$
 $$ b = [0] \in \mathbb{R} $$
@@ -92,27 +92,27 @@ $$ Ax = b \Rightarrow \left[ \begin{matrix} d_1 & \cdots & d_n \end{matrix} \rig
 For the solution of the aforementioned optimization problem, it was chosen to use the \texttt{qpsolvers} library for the Python programming language, which internally uses the \texttt{quadprog} module as backend but offers an API that is similar to Matlab's quadratic programming functions. The computation of the solution to the SVM problem is carried out in the \texttt{solve\_svm()} function, which performs the following actions:
 
 \begin{itemize}
-    \item It defines the matrices $P, q, G, h, A, b$ using the $x_i$ and $d_i$ training data and the kernel function passed as parameters; for the stability of the algorithm, that requires $P$ to be positive definite but this condition may be violated due to the finite machine arithmetic, the elements on the main diagonal of matrix $P$ are slightly incremented by adding a small ($10^{-9}$) positive number, so that, in the end, the possible small, negative eigenvalues of the original matrix $P$ are mapped to small, positive values (which is a sufficient condition for matrix $P$ to be positive definite).
+    \item It defines the matrices $P, q, G, h, A, b$ using the $x_i$ and $d_i$ training data and the kernel function passed as parameters; for the stability of the algorithm, that requires $P$ to be positive definite although this condition may be violated due to computations in finite machine arithmetic, the elements on the main diagonal of matrix $P$ are slightly incremented by adding them a small positive quantity ($10^{-9}$), so that, in the end, the possible small, negative eigenvalues of the original matrix $P$ are mapped to small, positive numbers (which is a sufficient condition for matrix $P$ to be positive definite).
     
     \item It runs the solver by invoking the \texttt{solve\_qp()} method offered by the \texttt{qpsolvers} library.
     
-    \item It sets all elements which are smaller than the \texttt{tol} parameter to zero: in fact, the numerical optimization procedure, due to the approximations in finite machine arithmetic, does not return a perfectly zero value for the $\alpha_i$ coefficients that are not correspondent to a support vector, but instead returns some small (even negative in some cases) values; since those values do not carry any information as they are only byproducts of the optimization procedure, they can safely be mapped to zero.
+    \item It sets all elements which are smaller than the \texttt{tol} parameter to zero: due to the approximations in finite machine arithmetic, in fact, the numerical optimization procedure does not return a perfectly zero value for the $\alpha_i$ coefficients that are not correspondent to a support vector, but instead returns some small (even negative in some cases) values; since those values do not carry any information as they are only byproducts of the optimization procedure, they can safely be mapped to zero.
     
     \item Based on the indices of non-zero $\alpha_i$ values, it constructs the lists of the support vectors $x_{SV}$ and of their associated output $d_{SV}$ and coefficients $\alpha_{SV}$.
     
-    \item It constructs the optimal separator by applying the relationship:
+    \item It defines the ``optimal'' separator according to the formula:
     
     $$ g(x) = \sum_{i = 1}^{n_{SV}} \alpha_{SV,i} d_{SV,i} K(x_i, x) + \theta $$
     $$ \theta = d_{SV,1} - \sum_{i = 1}^{n_{SV}} \alpha_{SV,i} d_{SV,i} K(x_i, x_{SV,1}) $$
 
-    Where $x_{SV,i}$, $d_{SV,i}$ and $\alpha_{SV,i}$ denote the $i$-th support vector and associated output and coefficient. The choice of the support vector used to define the bias $\theta$ is arbitrary; in this case, the first support vector has been used.
+    Where $x_{SV,i}$, $d_{SV,i}$ and $\alpha_{SV,i}$ denote the $i$-th support vector and its associated output and coefficient. The choice of the support vector used to define the bias $\theta$ is arbitrary; in this case, it was chosen to always use the first one.
 
     \item Finally, it returns the optimal separator (as a lambda function) and the list of the support vectors and their associated outputs.
 \end{itemize}
 
 \subsection{Separator evaluation and plotting}
 
-The obtained separator, together with the training set and the list of support vectors, is then passed to the \texttt{plot\_sep()} function. This function plots the training set and the support vectors (using a round, bigger marker, to encircle the corresponding data point) in a way similar to the \texttt{plot\_data()} function. Then, it proceeds to evaluate the separator in a \texttt{eval\_pts*eval\_pts} grid of points in $[0,1]^2$; the results of the evaluation are stored in the \texttt{evals} matrix and plotted using the \texttt{contours()} function offered by the Matplotlib library, after setting the levels of interest to $g(x) = -1$, $g(x) = 0$ and $g(x) = 1$ (corresponding respectively to $\mathcal{H}^-$, $\mathcal{H}$ and $\mathcal{H}^+$).
+The obtained separator, together with the training set and the list of support vectors, is then passed to the \texttt{plot\_sep()} function. This plots the training set and the support vectors (using a round, bigger marker, to encircle the corresponding data point) in a way similar to the \texttt{plot\_data()} function. Then, it proceeds to evaluate the separator on a \texttt{eval\_pts*eval\_pts} grid of points in $[0,1]^2$; the results of the evaluation are stored in the \texttt{evals} matrix and plotted using the \texttt{contours()} function offered by the Matplotlib library, after setting the levels of interest to $g(x) = -1$, $g(x) = 0$ and $g(x) = 1$ (corresponding respectively to $\mathcal{H}^-$, $\mathcal{H}$ and $\mathcal{H}^+$).
 
 \subsection{Obtained results}
 
@@ -124,7 +124,7 @@ The presented methodology was applied to train and compare different support vec
     \item A Gaussian kernel with $c = 1$: $K(x, y) = e^{-||x - y||^2}$.
 \end{itemize}
 
-The polynomial kernel with degree 2 turned out however to be too simple to solve this problem, as the resulting SVM was not able to correctly classify all the training pattern. Instead, both the SVMs built using the 10-degree polynomial and the Gaussian kernels were instead appropriate for the task; the obtained separation in the two cases is shown in figures \ref{sep_poly} and \ref{sep_exp}.
+The polynomial kernel with degree 2 turned out however to be too simple to solve this problem, as the resulting SVM was not able to correctly classify all the training patterns. Instead, both the SVMs built using the 10-degree polynomial and the Gaussian kernels were appropriate for the task; the obtained separation in the two cases is shown in figures \ref{sep_poly} and \ref{sep_exp}.
 
 \begin{figure}[h]
     \centering
@@ -140,7 +140,7 @@ The polynomial kernel with degree 2 turned out however to be too simple to solve
     \label{sep_exp}
 \end{figure}
 
-The solution based on the polynomial kernel uses the following support vectors:
+The solution using the polynomial kernel is based on the following support vectors:
 
 \begin{itemize}
     \item For $C_1$:

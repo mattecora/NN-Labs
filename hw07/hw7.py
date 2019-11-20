@@ -9,9 +9,11 @@ plt.rc('text', usetex=True)
 np.random.seed(123)
 
 def kern_poly(d):
+    # Generate a polynomial kernel of degree d
     return lambda x, y : (1 + x.transpose() @ y) ** d
 
 def kern_gaus(c):
+    # Generate a Gaussian kernel with constant c
     return lambda x, y : np.exp(-c * np.linalg.norm(x - y) ** 2)
 
 def solve_svm(n, x, d, kernel, tol):
