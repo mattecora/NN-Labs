@@ -39,7 +39,7 @@ The centroids generation step is carried out using the provided implementation o
     \item It computes the nearest centroid for each sample, storing the associations in the \texttt{classes} list;
     \item It starts a loop until the \texttt{unchanged} flag goes to zero; for each iteration:
     \begin{itemize}
-        \item It recomputes each centroid by averaging all the points in the associated Voronoi region, that is to say the points that were assigned to that centroid in the previous iteration; if no points are associated to the considered centroid (operation that returns a division by zero error), a new centroid is randomly initialized;
+        \item It recomputes each centroid by averaging all the points in the associated Voronoi region, defined by the points that were assigned to that centroid in the previous iteration; if no points are associated to the considered centroid (operation that returns a division by zero error), a new centroid is randomly initialized;
         \item It computes the new nearest centroid for each sample, storing the associations in the \texttt{new\_classes} list;
         \item It checks whether the \texttt{classes} and \texttt{new\_classes} lists are the same and set the result of the comparison to the value of \texttt{unchanged};
         \item It copies back the new classes on the \texttt{classes} list.
@@ -62,7 +62,7 @@ The centroids computed at the previous steps have been used to map the original 
 
 $$ \phi(x, \mu) = e^{-\beta ||x - \mu||^2} $$
 
-Where $\beta$ is a free parameter, $x$ is one of the considered samples and $\mu$ is one of the computed centroids. In this case, each of the 2-dimensional samples was mapped on a 20-dimensional vector defined as:
+Where $\beta$ is a free parameter (sometimes defined in terms of the standard deviation of the data), $x$ is one of the considered samples and $\mu$ is one of the computed centroids. In this case, each of the 2-dimensional samples was mapped on a 20-dimensional vector defined as:
 
 $$ x' = \left[ \begin{matrix} \phi(x, \mu_1) \\ \vdots \\ \phi(x, \mu_{20}) \end{matrix} \right] = \left[ \begin{matrix} e^{-\beta ||x - \mu_1||^2} \\ \vdots \\ e^{-\beta ||x - \mu_{20}||^2} \end{matrix} \right] $$
 
@@ -73,7 +73,7 @@ As for the parameter $\beta$, two possible values were tested ($\beta_1 = 1, \be
 The RBF-mapped representations of the original samples have been used for the supervised training a perceptron with 20 inputs (21, if we consider also the bias-related input $x_0 = 1$), in the hope that they were linearly separable in the RBF space. For the training step, a mostly standard perceptron training algorithm has been used, with a few notable differences:
 
 \begin{itemize}
-    \item Since in the original version of the PTA the considered perceptron use step activation (while here it uses signum activation), the shorthand formula for weight update needs to be split into two separate update rules:
+    \item Since in the original version of the PTA the considered perceptron use step activation (while here it uses signum activation), the shorthand formula for weight update was split into two separate update rules:
     \begin{itemize}
         \item The first is applied when $d_i = 1$ but $y_i = \sgn{(wx_i)} = -1$:
         $$ w \gets w + \eta x_i $$ 
@@ -98,17 +98,13 @@ A first attempt was initially performed by setting parameters $\beta$ to 1, $\et
     \label{sep_20_1}
 \end{figure}
 
-The conclusion we can draw from this is that our RBF mapping is not good enough to make our patterns separable in the RBF space. In particular, we can notice that, since our training samples are drawn from $[0,1]^2$, the maximum distance between a point and a centroid can be no more than $\sqrt{2}$ (when they are in two opposite vertices of the considered region), and in practice it is generally much less than that (it is very unlikely for such a distribution of data to happen). Thus, when we map our data points into the RBF space, each feature $x_i'$ of the mapped point will satisfy the following inequality:
+The conclusion we can draw from this is that our RBF mapping is not good enough to make our patterns separable in the RBF space. In particular, we can notice that, since our training samples are drawn from $[0,1]^2$, the maximum distance between a point and a centroid can be no more than $\sqrt{2}$ (when they are in two opposite vertices of the considered region), and in practice it is generally much less than that (it is very unlikely for such a distribution of data to happen). When we map our data points into the RBF space, each feature $x_i'$ of the mapped point will consequently satisfy the following inequality:
 
 $$ e^{-\max{||x - \mu||^2}} = e^{-2} = 0.1353 \le x_i' \le 1 = e^{0} = e^{-\min{||x - \mu||^2}} $$
 
-In other words, the mapped data points be confined in the $[e^{-2}, 1]^{20}$ sub-region of the ``complete'' mapping space $(0,1]^{20}$ (0 is excluded since we assume that $\max{||x - \mu||^2} < \infty$), effectively losing a very large portion of the RBF space. In fact, the volume of such a region can be computed as:
+In other words, the mapped data points be confined in the $[e^{-2}, 1]^{20}$ sub-region of the ``complete'' mapping space $(0,1]^{20}$ (0 is excluded since we assume that $\max{||x - \mu||^2} < \infty$), effectively losing a very large portion of the RBF space. For this reason, we have to reconsider the way our patterns are mapped to the RBF space; an obvious choice of intervention is on parameter $\beta$, which in the second run was significantly increased to the value of 10. In this way, almost the entire mapping space can be used (since $e^{-20} = 2 * 10^{-9}$, leading to a very limited loss in terms of excluded volume); thus, we can expect that our patterns will be more likely to be linearly separable.
 
-$$ V_{[e^{-2}, 1]^{20}} = (1 - e^{-2})^{20} = 0.0546 $$
-
-Which is significantly smaller (about 20 times less) than the size of the complete mapping space (which is $V_{[0,1]^{20}} = 1^{20} = 1$). For this reason, we have to reconsider the way our patterns are mapped to the RBF space; in particular, an obvious choice of intervention is on parameter $\beta$, which in the second run was significantly increased to the value of 10. In this way, almost the entire mapping space can be used (since $e^{-20} = 2 * 10^{-9}$, leading to a very limited loss in terms of excluded volume) and thus we can expect that our patterns will be more likely to be linearly separable. 
-
-Running the script using $\beta = 10$ and leaving all the other parameters to the same values as before, PTA was able to converge in a relatively small number of epochs (90), sign that by exploiting almost the entirety of our mapping space our patterns become clearly separable by a linear classifier. Results for this second run are shown in figure \ref{sep_20_10}.
+Running the script using $\beta = 10$ and leaving all the other parameters to their previous values, PTA was able to converge in a relatively small number of epochs (90), sign that, by exploiting almost the entirety of our mapping space, our patterns become clearly separable by a linear classifier. Results for this second run are shown in figure \ref{sep_20_10}.
 
 \begin{figure}[h]
     \centering
@@ -119,7 +115,9 @@ Running the script using $\beta = 10$ and leaving all the other parameters to th
 
 \subsection{Differences with the case $k = 4$}
 
-A third run was finally performed, using the same value of $\beta = 10$ as before but setting the value of $k$ to 2 for both runs of the $k$-means algorithm (for the positive and the negative classes). Again, the PTA was not able to reach convergence within the configured epoch limit, showing large oscillations in the number of misclassifications throughout the different epochs. We can conclude that, also in this case, our mapping is not good enough to make the classes linearly separable; this is also reflected by the obtained separator, which appears to be significantly different from the original one and not able to divide the data points clearly. Results of the $k$-means clustering procedure and the respective separator are shown in figures \ref{data_4} and \ref{sep_4_10}.
+A third run was finally performed, using the same value of $\beta = 10$ as before but setting the value of $k$ to 2 for both runs of the $k$-means algorithm (for the positive and the negative classes). Again, the PTA was not able to reach convergence within the configured epoch limit, showing large oscillations in the number of misclassifications throughout the different epochs.
+
+From this, we can conclude that, in this case as well, our mapping is not good enough to make the classes linearly separable; this is also reflected by the obtained separator, which appears to be significantly different from the original one and not able to divide the data points clearly. Results of the $k$-means clustering procedure and the separation obtained by running PTA are shown in figures \ref{data_4} and \ref{sep_4_10}.
 
 \begin{figure}[h]
     \centering
